@@ -1,0 +1,18 @@
+{
+  "timeZone": "UTC",
+  "defaultcontext": "sitting",
+  "defaulttemplate": "json",
+  "context": {
+    "resource": {
+      "type": "resource"
+    },
+    "sitting": {
+      "defaultview": "dashboard",
+      "view": {
+        "dashboard": {
+          "template": "manager"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "name": "noxkiwi/spotigame",
+  "description": "Web based game for Spotify.",
+  "version": "0.0.1",
+  "type": "package",
+  "license": "GPL-3.0-or-later",
+  "url": "https://nox.kiwi/",
+  "keywords": [
+    "spotigame",
+    "spotify"
+  ],
+  "homepage": "https://nox.kiwi/",
+  "time": "2023-01-28",
+  "authors": [
+    {
+      "name": "Jan Nox",
+      "email": "jan.nox@pm.me",
+      "homepage": "https://nox.kiwi",
+      "role": "Lead Developer"
+    }
+  ],
+  "require": {
+    "php": ">=8.2.0",
+    "noxkiwi/cache": "dev-master",
+    "noxkiwi/core": "dev-master",
+    "noxkiwi/crud": "dev-master",
+    "noxkiwi/dataabstraction": "dev-master",
+    "noxkiwi/database": "dev-master"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7"
+  },
+  "suggest": {
+    "ext-redis": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "noxkiwi\\spotigame\\": "backend/class/"
+    }
+  }
+}

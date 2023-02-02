@@ -23,7 +23,6 @@ abstract class AbstractVote extends AbstractEntity
     public Player  $player;
     public Sitting $sitting;
     public Move    $move;
-    public Entry   $entry;
     public int     $points;
     public int     $flags;
     public ?int    $year;

@@ -3,8 +3,10 @@ namespace noxkiwi\spotigame\Question;
 
 use noxkiwi\core\Request;
 use noxkiwi\spotigame\Answer\Answer;
+use noxkiwi\spotigame\Entity\AbstractEntity;
 use noxkiwi\spotigame\Song\Song;
 use noxkiwi\spotigame\Vote\Vote;
+use noxkiwi\translator\Traits\TranslatorTrait;
 
 /**
  * I am an abstract Question.
@@ -16,10 +18,25 @@ use noxkiwi\spotigame\Vote\Vote;
  * @version      1.0.0
  * @link         https://nox.kiwi/
  */
-abstract class AbstractQuestion
+abstract class AbstractQuestion extends AbstractEntity
 {
+    use TranslatorTrait;
+
     protected const PARAM_NAME  = '';
-    public const    QUESTION_ID = -1;
+    public const    QUESTION_ID = 42;
+    public string  $question;
+    protected Song $song;
+    public string  $emoji;
+    public string  $type;
+    public ?array  $options;
+    public string  $param;
+
+    public function __construct(Song $song)
+    {
+        $this->id       = static::QUESTION_ID;
+        $this->question = $this->translate($this->question);
+        $this->song     = $song;
+    }
 
     /**
      * I will create the front end for the Player to use according to the given $song.
@@ -37,13 +54,12 @@ abstract class AbstractQuestion
      *
      * The result inside the Answer will be determined by validating the given $request against the $song.
      *
-     * @param \noxkiwi\spotigame\Song\Song $song
      * @param \noxkiwi\spotigame\Vote\Vote $vote
      * @param \noxkiwi\core\Request        $request
      *
      * @return \noxkiwi\spotigame\Answer\Answer
      */
-    abstract public function validate(Song $song, Vote $vote, Request $request): Answer;
+    abstract public function validate(Vote $vote, Request $request): Answer;
 
     /**
      * I will create a basic Answer object for the given $vote and $response.

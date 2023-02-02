@@ -19,27 +19,13 @@ use noxkiwi\spotigame\Vote\Vote;
  * @version      1.0.0
  * @link         https://nox.kiwi/
  */
-final class AlbumMultipleChoice extends AbstractQuestion
+final class ResultQuestion extends AbstractQuestion
 {
-    protected const PARAM_NAME  = 'album';
-    public const    QUESTION_ID = 3;
-    public string $question = 'album_multiple_choice';
-    public string $emoji    = '📀';
-    public string $type     = 'select';
-    public string $param    = 'album';
-
-    /**
-     * I am overwritten to create random options to pick from.
-     *
-     * @param \noxkiwi\spotigame\Song\Song $song
-     *
-     * @throws \noxkiwi\singleton\Exception\SingletonException
-     */
-    public function __construct(Song $song)
-    {
-        $this->options = OptionHelper::randomPick(SongModel::getInstance()->getList('song_album'), $song->album, 5);
-        parent::__construct($song);
-    }
+    protected const PARAM_NAME  = 'result';
+    public const    QUESTION_ID = -1;
+    public string $question = 'result';
+    public string $emoji    = '?';
+    public string $type     = 'result';
 
     /**
      * @inheritDoc

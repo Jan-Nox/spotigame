@@ -11,7 +11,9 @@ use noxkiwi\spotigame\Model\VoteModel;
 use noxkiwi\spotigame\Question\AlbumMultipleChoice;
 use noxkiwi\spotigame\Question\ArtistMultipleChoice;
 use noxkiwi\spotigame\Question\ReleaseYearRange;
+use noxkiwi\spotigame\Question\ResultQuestion;
 use noxkiwi\spotigame\Question\TitleMultipleChoice;
+use noxkiwi\spotigame\Question\VerifyQuestion;
 use noxkiwi\spotigame\Sitting\Sitting;
 use noxkiwi\spotigame\Song\Song;
 use noxkiwi\spotigame\Vote\Vote;
@@ -53,20 +55,15 @@ abstract class AbstractMove extends AbstractEntity
         $voteEntry->player_id   = $vote->player->getId();
         $voteEntry->move_id     = $move->id;
         $voteEntry->save();
-        $vote->id = (int)$voteEntry->vote_id;
-        /** @var \noxkiwi\spotigame\Question\AbstractQuestion[] $validations */
+        $questions = $move->getQuestions();
+        $vote->id  = (int)$voteEntry->vote_id;
+        /** @var \noxkiwi\spotigame\Question\AbstractQuestion[] $questions */
         // @todo: This array needs to come from the sitting where the questions and points are set up!
-        $validations = [
-            new AlbumMultipleChoice(),
-            new TitleMultipleChoice(),
-            new ArtistMultipleChoice(),
-            new ReleaseYearRange()
-        ];
-        foreach ($validations as $validation) {
-            $answer = $validation->validate($move->song, $vote, Request::getInstance());
+        foreach ($questions as $question) {
+            $answer = $question->validate($vote, Request::getInstance());
             $answer->store();
-            $voteEntry->vote_points                  += $answer->points;
-            $vote->answers[$validation::QUESTION_ID] = $answer;
+            $voteEntry->vote_points += $answer->points;
+            $vote->answers[]        = $answer;
         }
         $voteEntry->save();
         // STORE POINTS TO PLAYER
@@ -85,5 +82,28 @@ abstract class AbstractMove extends AbstractEntity
     {
         $cache = Cache::getInstance();
         $cache->clearKey('MOVE', 'MOVE');
+    }
+
+    /**
+     * @throws \noxkiwi\singleton\Exception\SingletonException
+     * @return array
+     */
+    public function getQuestions(): array
+    {
+        return [
+            new ArtistMultipleChoice($this->song),
+            new AlbumMultipleChoice($this->song),
+            new TitleMultipleChoice($this->song),
+            new ReleaseYearRange($this->song)
+        ];
+    }
+
+    public function buildSetup(): array
+    {
+        $questions   = $this->getQuestions();
+        $questions[] = new VerifyQuestion($this->song);
+        $questions[] = new ResultQuestion($this->song);
+
+        return $questions;
     }
 }

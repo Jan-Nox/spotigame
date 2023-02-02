@@ -1,0 +1,37 @@
+{
+  "action": {
+    "element": [
+      {
+        "link": {
+          "context": "crud",
+          "view": "create"
+        },
+        "icon": "EDIT",
+        "target": "modal",
+        "buttonClass": "btn-success",
+        "text": "create"
+      },
+      {
+        "link": {
+          "view": "delete"
+        },
+        "icon": "DELETE",
+        "buttonClass": "btn-danger",
+        "target": "modal"
+      }
+    ],
+    "top": [
+      {
+        "link": {
+          "context": "crud",
+          "view": "create"
+        },
+        "icon": "PLUS",
+        "target": "modal",
+        "buttonClass": "btn-success",
+        "iconColor": "text-dark",
+        "text": "create"
+      }
+    ]
+  }
+}

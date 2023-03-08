@@ -1,12 +1,20 @@
 <?php declare(strict_types = 1);
 namespace noxkiwi\spotigame;
 
-use Exception;use noxkiwi\core\Environment;
-use noxkiwi\core\Helper\FrontendHelper;use noxkiwi\core\Helper\JsonHelper;
-use noxkiwi\core\Path;use noxkiwi\core\Session;use function chr;use function print_r;
+use Exception;
+use noxkiwi\core\Environment;
+use noxkiwi\core\Helper\FrontendHelper;
+use noxkiwi\core\Helper\JsonHelper;
+use noxkiwi\core\Path;
+use noxkiwi\core\Session;
+use noxkiwi\translator\Translator;
+use function chr;
+use function print_r;
+use function var_dump;
 
 /** @var \noxkiwi\core\Response $data */
 try {
+    $noAnswer     = Translator::getInstance()->translate('NO_ANSWER');
     $stepSetup    = JsonHelper::encode((array)$data->get('stepSetup', []));
     $hostName     = Environment::getInstance()->get('server>hostname', 'https://spotigame.nox.kiwi/');
     $player       = $data->get('player');
@@ -18,7 +26,8 @@ try {
     $dbg          .= print_r($data->get('song'), true);
     $song         = $data->get('song');
     $songDuration = $song->duration - 2000;
-} catch (Exception) {
+} catch (Exception $e) {
+    var_dump($e);
     die('Tja!');
 }
 ?><!doctype html>
@@ -48,7 +57,7 @@ try {
 
         .step > div > ul > li.wrong {background : rgba(227, 123, 123, 1);color : black;}
 
-        #btnNext {color : rgba(123, 227, 123, 1)}
+        #btnNext {color : white;background : rgb(56, 155, 255);}
     </style>
 </head>
 <body>
@@ -62,7 +71,7 @@ try {
     <hr/>
     <?= FrontendHelper::parseFile(Path::getInheritedPath('frontend/element/dev/debugbox.php'), $dbg) ?>
     <div class="text-center">
-        <a href="https://github.com/Jan-Nox/spotigame" target="_blank">spotigame v0.0.00013</a> Â©ï¸ 2023 by <a href="https://github.com/Jan-Nox" target="_blank">Jan Nox</a> and run on <a href="https://github.com/noxkiwi" target="_blank">kiwi fruit</a>
+        <a href="https://github.com/Jan-Nox/spotigame" target="_blank">spotigame v0.0.00014</a> ©️ 2023 by <a href="https://github.com/Jan-Nox" target="_blank">Jan Nox</a> and run on <a href="https://github.com/noxkiwi" target="_blank">kiwi fruit</a>
     </div>
 
 </div>
@@ -77,12 +86,11 @@ try {
 
     function buildOptions(stepData) {
         let html        = "<ul>",
-            optionIndex = 0,
             optionCount = stepData.options.length;
-        for (optionIndex = 0; optionIndex <= optionCount - 1; optionIndex++) {
+        for (let optionIndex = 0; optionIndex <= optionCount - 1; optionIndex++) {
             let myOption = stepData.options[optionIndex],
                 selected = "";
-            if ((vote[stepData.key] || "") === myOption) {
+            if ((vote[stepData.param] || "") === myOption) {
                 selected = "active";
             }
             html = html + "<li class=\"select " + selected + "\">" + myOption + "</li>";
@@ -93,23 +101,40 @@ try {
     }
 
     function showSelectStep(stepData) {
-        stepBox.find("h4").html("<span class=\"previous-step float-start pointer \">âªï¸</span>" + stepData.question + "<span class=\"next-step float-end pointer\">â©</step>");
+        stepBox.find("h4").html("<span class=\"previous-step float-start pointer \">⏪️</span>" + stepData.question + "<span class=\"next-step float-end pointer\">⏩</step>");
         stepBody.html(buildOptions(stepData));
     }
 
     function showRangeStep(stepData) {
-        stepBox.find("h4").html("<span class=\"previous-step float-start pointer \">âªï¸</span>" + stepData.question + "<span class=\"next-step float-end pointer\">â©</step>");
-        stepBody.html("<input type=\"range\" name=\"year\" class=\"year form-range\" min=\"1900\" max=\"2023\" id=\"customRange2\"><span class=\"rangeDisplay\">XXXX</span>");
+        stepBox.find("h4").html("<span class=\"previous-step float-start pointer \">⏪️</span>" + stepData.question + "<span class=\"next-step float-end pointer\">⏩</step>");
+        stepBody.html(`
+<div class="input-group mb-3">
+  <span class="input-group-text rangeMover" data-offset="-10" id="basic-addon1">-10</span>
+  <span class="input-group-text rangeMover" data-offset="-1" id="basic-addon1">-1</span>
+  <input type="number" min="1900" max="2023" value="` + (vote.year || 1991) + `" class="form-control rangeDisplay text-center">
+  <span class="input-group-text rangeMover" data-offset="1" id="basic-addon2">+1</span>
+  <span class="input-group-text rangeMover" data-offset="10" id="basic-addon2">+10</span>
+</div>
+<input type="range" name="year" class="year form-range"  value="` + (vote.year || 1991) + `" min="1900" max="2023" id="customRange2">
+`);
     }
 
     function showVerifyStep(stepData) {
-        let html = "";
-        stepBox.find("h4").html("<span class=\"pointer previous-step float-start \">âªï¸</span>" + stepData.question + "<span class=\"pointer next-step float-end\">ðŸ’š</step>");
+        let html      = "",
+            stepCount = stepSetup.length - 1;
+
+        stepBox.find("h4").html("<span class=\"pointer previous-step float-start \">⏪️</span>" + stepData.question + "<span class=\"pointer next-step float-end\">💚</step>");
         html = html + "<ul>";
-        html = html + "<li class=\"pointer\" onclick=\"showStep(0)\">ðŸŽ¤" + (vote.artist || "no answer") + "</li>";
-        html = html + "<li class=\"pointer\" onclick=\"showStep(1)\">ðŸ’¿" + (vote.album || "no answer") + "</li>";
-        html = html + "<li class=\"pointer\" onclick=\"showStep(2)\">ðŸŽ¼" + (vote.title || "no answer") + "</li>";
-        html = html + "<li class=\"pointer\" onclick=\"showStep(3)\">ðŸ“†" + (vote.year || "no answer") + "</li>";
+
+        for (let stepIndex = 0; stepIndex <= stepCount; stepIndex++) {
+            let stepData = stepSetup[stepIndex];
+
+            if (stepData.id === -1) {
+                continue;
+            }
+
+            html = html + "<li class=\"pointer\" onclick=\"showStep(" + stepIndex + ")\">" + stepData["emoji"] + (vote[stepData["param"]] || "<?=$noAnswer?>") + "</li>";
+        }
         html = html + "</ul>";
         stepBody.html(html);
     }
@@ -131,16 +156,17 @@ try {
             success        : function (response) {
                 nextButton.removeClass("d-none");
                 progressbar.removeClass("bg-success").removeClass("bg-warning").removeClass("bg-danger").removeClass("progress-bar-striped").removeClass("progress-bar-animated").addClass("bg-primary");
-                let html = "";
+                let html        = "<ul>",
+                    answerCount = response.answers.length - 1;
                 stepBox.find("h4").html("You've received " + response.points + " points");
-                html = html + "<ul>";
-                html = html + "<li  class=\"" + response.answers[1].colour + "\">ðŸŽ¤" + response.move.song.artist + "</li>";
-                html = html + "<li  class=\"" + response.answers[3].colour + "\">ðŸ’¿" + response.move.song.album + "</li>";
-                html = html + "<li  class=\"" + response.answers[2].colour + "\">ðŸŽ¼" + response.move.song.title + "</li>";
-                html = html + "<li  class=\"" + response.answers[4].colour + "\">ðŸ“†" + response.move.song.year + "</li>";
-                html = html + "<li  class=\" btnNext\">Continue</li>";
-                html = html + "</ul>";
-                stepBody.html(html);
+                for (let answerIndex = 0; answerIndex <= answerCount; answerIndex++) {
+                    let answerData = response.answers[answerIndex],
+                        stepData   = stepSetup[answerIndex];
+
+                    html = html + "<li class=\"" + response.answers[answerIndex].colour + "\" class=\"pointer\">" + stepData["emoji"] + answerData.correct + "</li>";
+                }
+                html = html + "<li  id=\"btnNext\">Continue</li>";
+                stepBody.html(html + "</ul>");
             }
         });
     }
@@ -174,13 +200,25 @@ try {
         stepBox.fadeIn(200);
     }
 
+    function floorCeil(floor, value, ceil) {
+        return Math.max(floor, Math.min(value, ceil));
+    }
+
     function incrementStep() {
-        curStep++;
+        let nuStep = floorCeil(0, curStep + 1, stepSetup.length - 1);
+        if (nuStep === curStep) {
+            return;
+        }
+        curStep = nuStep;
         showStep(curStep);
     }
 
     function decrementStep() {
-        curStep--;
+        let nuStep = floorCeil(0, curStep - 1, stepSetup.length - 1);
+        if (nuStep === curStep) {
+            return;
+        }
+        curStep = nuStep;
         showStep(curStep);
     }
 
@@ -189,20 +227,35 @@ try {
         // SHOW FIRST STEP!
         showStep(curStep);
 
+        $("body").delegate(".rangeMover", "click", function () {
+            let display = $(".rangeDisplay"),
+                val     = parseInt(display.val()),
+                offset  = parseInt($(this).data("offset")),
+                floor   = parseInt(display.attr("min")),
+                ceil    = parseInt(display.attr("max")),
+                nuVal   = floorCeil(floor, val + offset, ceil),
+                slider  = $(".year");
+
+            display.val(nuVal);
+            slider.val(nuVal);
+            vote.year = nuVal;
+
+        });
+
         $("body").delegate("ul>li.select", "click", function () {
             let datum    = $(this).html(),
                 stepData = stepSetup[curStep],
-                name     = stepData.key;
+                name     = stepData.param;
 
             vote[name] = datum;
             incrementStep();
         });
         $("body").delegate("input.year", "change", function () {
             let year = $(this).val();
-            $("span.rangeDisplay").html(year);
+            $(".rangeDisplay").val(year);
             vote.year = year;
         });
-        $("body").delegate(".btnNext", "click", function () {
+        $("body").delegate("#btnNext", "click", function () {
             window.location.href = "/?context=game&view=ask&next";
         });
 
@@ -242,7 +295,6 @@ try {
             div = maxSongMs;
         }
         let curP = 100 * (curMs / div);
-        console.log(curMs + " of " + maxMs + " are over. This is " + curP + "%");
         progressbar.attr("style", "width: " + curP + "%");
         progressbar.attr("aria-valuenow", curP);
         if (! isFinished && ! leftWarning && maxMs - curMs <= warnMs) {

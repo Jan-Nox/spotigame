@@ -2,6 +2,7 @@
 namespace noxkiwi\spotigame\Entity;
 
 use JetBrains\PhpStorm\Pure;
+use noxkiwi\dataabstraction\Entry;
 use Stringable;
 
 /**
@@ -19,6 +20,7 @@ abstract class AbstractEntity implements Stringable
     protected const TYPE = 'INACCURATE';
     public string $name = 'unknown';
     public int    $id   = -1;
+    public Entry  $entry;
 
     /**
      * I will solely set the name of the Entity.

@@ -25,7 +25,11 @@ use noxkiwi\spotigame\Vote\Vote;
 final class ReleaseYearRange extends AbstractQuestion
 {
     protected const PARAM_NAME  = 'year';
-    public const QUESTION_ID = 4;
+    public const    QUESTION_ID = 4;
+    public string $question = 'release_year_range';
+    public string $emoji    = '🗓️';
+    public string $type     = 'range';
+    public string $param    = 'year';
 
     /**
      * @inheritDoc
@@ -38,26 +42,26 @@ final class ReleaseYearRange extends AbstractQuestion
     /**
      * @inheritDoc
      */
-    public function validate(Song $song, Vote $vote, Request $request): Answer
+    public function validate(Vote $vote, Request $request): Answer
     {
         $answer          = $this->prepareAnswer($vote, $request);
-        $answer->correct = (string)$song->year;
+        $answer->correct = (string)$this->song->year;
         // Release year was matched exactly?
-        if ($song->year === (int)$answer->input) {
+        if ($this->song->year === (int)$answer->input) {
             $answer->points += 2;
             $answer->colour = Answer::COLOUR_RIGHT;
 
             return $answer;
         }
-        $minYear = $song->year - 5;
-        $maxYear = $song->year + 5;
+        $minYear = $this->song->year - 5;
+        $maxYear = $this->song->year + 5;
         // Release year was matched within threshold (negative)?
-        if ($answer->input >= $minYear && $answer->input <= $song->year) {
+        if ($answer->input >= $minYear && $answer->input <= $this->song->year) {
             $answer->colour = Answer::COLOUR_PARTIAL;
             $answer->points++;
         }
         // Release year was matched within threshold (positive)?
-        if ($answer->input <= $maxYear && $answer->input >= $song->year) {
+        if ($answer->input <= $maxYear && $answer->input >= $this->song->year) {
             $answer->colour = Answer::COLOUR_PARTIAL;
             $answer->points++;
         }

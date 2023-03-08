@@ -3,6 +3,8 @@ namespace noxkiwi\spotigame\Question;
 
 use noxkiwi\core\Request;
 use noxkiwi\spotigame\Answer\Answer;
+use noxkiwi\spotigame\Helper\OptionHelper;
+use noxkiwi\spotigame\Model\SongModel;
 use noxkiwi\spotigame\Song\Song;
 use noxkiwi\spotigame\Vote\Vote;
 
@@ -20,15 +22,32 @@ use noxkiwi\spotigame\Vote\Vote;
 final class ArtistMultipleChoice extends AbstractQuestion
 {
     protected const PARAM_NAME  = 'artist';
-    public const QUESTION_ID = 1;
+    public const    QUESTION_ID = 1;
+    public string $question = 'artist_multiple_choice';
+    public string $emoji    = '🎤';
+    public string $type     = 'select';
+    public string $param    = 'artist';
+
+    /**
+     * I am overwritten to create random options to pick from.
+     *
+     * @param \noxkiwi\spotigame\Song\Song $song
+     *
+     * @throws \noxkiwi\singleton\Exception\SingletonException
+     */
+    public function __construct(Song $song)
+    {
+        $this->options = OptionHelper::randomPick(SongModel::getInstance()->getList('song_artist'), $song->artist, 5);
+        parent::__construct($song);
+    }
 
     /**
      * @inheritDoc
      */
-    public function validate(Song $song, Vote $vote, Request $request): Answer
+    public function validate(Vote $vote, Request $request): Answer
     {
         $answer          = $this->prepareAnswer($vote, $request);
-        $answer->correct = $song->artist;
+        $answer->correct = $this->song->artist;
         // @todo: Use the spotify URI instead of the artist name!
         if ($answer->correct === $answer->input) {
             $answer->points++;

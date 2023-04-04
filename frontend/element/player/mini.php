@@ -1,29 +1,21 @@
 <?php declare(strict_types = 1);
 namespace noxkiwi\spotigame;
 
-use noxkiwi\core\Environment;
-use noxkiwi\core\Session;
-use function in_array;
+use noxkiwi\core\Helper\FrontendHelper;
+use noxkiwi\core\Path;
 
 /** @var \noxkiwi\spotigame\Player\Player $data */
-$points    = number_format($data->points, 0);
-$adminLink = '';
-$e         = Environment::getInstance();
-if (in_array(Session::getInstance()->get('player_spotify_id'), (array)$e->get("admins", []), true)) {
-    $adminLink = <<<HTML
-<a href="/?context=crudfrontend&view=list&modelName=Player">⚙️</a>
-HTML;
-}
+$a = App::getInstance();
 echo <<<HTML
 <div class="row">
-    <div class="col-3">
-        <img src="$data->avatar" class="rounded" width="100%"/>
+    <div class="col-2">
+        {$a->returnIt(FrontendHelper::parseFile(Path::getInheritedPath('frontend/element/player/avatar.php'), $data))}
     </div>
-    <div class="col-9">
-        <h1>$data->name $adminLink</h1>
-        <p>
-            <small style="font-family: ' Courier New', 'Monospace'">🪙$points</small>
-        </p>
+    <div class="col-10">
+        <h1>
+            {$a->returnIt(FrontendHelper::parseFile(Path::getInheritedPath('frontend/element/player/name.php'), $data))}
+        </h1>
+        {$a->returnIt(FrontendHelper::parseFile(Path::getInheritedPath('frontend/element/player/points.php'), $data->points))}
     </div>
 </div>
 HTML;

@@ -22,32 +22,22 @@ abstract class AbstractQuestion extends AbstractEntity
 {
     use TranslatorTrait;
 
-    protected const PARAM_NAME  = '';
-    public const    QUESTION_ID = 42;
-    public string  $question;
+    public const   QUESTION_ID = -1;
+    public const   QUESTION    = '';
+    public string  $question = '';
     protected Song $song;
-    public string  $emoji;
-    public string  $type;
-    public ?array  $options;
-    public string  $param;
+    // FIELDS USED IN SERIALIZED OBJECTS BY JS!
+    public string $emoji;
+    public string $type;
+    public ?array $options;
+    public string $param;
 
     public function __construct(Song $song)
     {
         $this->id       = static::QUESTION_ID;
-        $this->question = $this->translate($this->question);
+        $this->question = $this->translate(static::QUESTION);
         $this->song     = $song;
     }
-
-    /**
-     * I will create the front end for the Player to use according to the given $song.
-     *
-     * I will NOT publish any data on the correct answers to the Response object or the output.
-     *
-     * @param \noxkiwi\spotigame\Song\Song $song
-     *
-     * @return string
-     */
-    abstract public function ask(Song $song): string;
 
     /**
      * I will create an Answer object for $this Question.
@@ -76,7 +66,7 @@ abstract class AbstractQuestion extends AbstractEntity
         $answer             = new Answer();
         $answer->colour     = Answer::COLOUR_WRONG;
         $answer->voteId     = $vote->id;
-        $answer->input      = $request->get(static::PARAM_NAME, ':NOT_ANSWERED:');
+        $answer->input      = $request->get($this->param, ':NOT_ANSWERED:');
         $answer->points     = 0;
         $answer->questionId = static::QUESTION_ID;
 

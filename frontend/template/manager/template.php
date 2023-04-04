@@ -3,7 +3,8 @@ namespace noxkiwi\spotigame;
 
 use noxkiwi\core\Response;
 
-?><!doctype html>
+?>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -26,6 +27,12 @@ use noxkiwi\core\Response;
     <!-- FONTAWESOME -->
     <link rel="stylesheet" type="text/css" media="screen" href="/asset/lib/fontawesome/css/all.min.css"/>
     <script type="text/javascript" src="/asset/lib/fontawesome/js/all.min.js"></script>
+
+    <!-- SELECTIZE
+    <script type="text/javascript" src="/asset/lib/selectize/examples/js/jqueryui.js"></script>
+    <script type="text/javascript" src="/asset/lib/selectize/dist/js/standalone/selectize.js"></script>
+    <script type="text/javascript" src="/asset/lib/selectize/examples/js/index.js"></script>
+     -->
 </head>
 <body>
 <nav class="navbar navbar-expand navbar-dark bg-dark">
@@ -35,6 +42,7 @@ use noxkiwi\core\Response;
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-link"><a href="">XXXX</a></li>
                 <li class="nav-link dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fa fa-solid fa-table fa-2x"></i>
@@ -57,6 +65,7 @@ use noxkiwi\core\Response;
 </nav>
 <hr/>
 <div class="container-fluid">
+
     <?= Response::getInstance()->get('content') ?>
 </div>
 </body>

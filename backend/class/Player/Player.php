@@ -1,6 +1,7 @@
 <?php declare(strict_types = 1);
 namespace noxkiwi\spotigame\Player;
 
+use Exception;
 use noxkiwi\core\Exception\AuthenticationException;
 use noxkiwi\core\Session;
 use noxkiwi\dataabstraction\Entry;
@@ -34,8 +35,10 @@ final class Player extends AbstractPlayer
         $entry  = PlayerModel::expect($playerId);
         $player->setName($entry->player_name);
         $player->setId($playerId);
-        $player->points = (int)$entry->player_points;
-        $player->avatar = $entry->player_avatar;
+        $player->points   = (int)$entry->player_points;
+        $player->avatar   = $entry->player_avatar;
+        $player->playerId = $entry->player_id;
+        $player->settings = (array)$entry->player_settings;
 
         return $player;
     }
@@ -90,25 +93,33 @@ final class Player extends AbstractPlayer
     /**
      * @param \stdClass $player
      *
-     * @throws \noxkiwi\core\Exception\InvalidArgumentException
-     * @throws \noxkiwi\singleton\Exception\SingletonException
+     * @throws \Exception
      * @return \noxkiwi\dataabstraction\Entry
      */
     private static function createPlayer(stdClass $player): Entry
     {
-        // If not found yet, create a new player entry.
-        $entry                    = PlayerModel::getInstance()->getEntry();
-        $entry->player_flags      = 1;
-        $entry->player_spotify_id = $player->uri;
-        $entry->player_name       = $player->display_name;
-        $entry->email             = $player->email;
-        $entry->player_url        = $player->external_urls->spotify;
-        $entry->player_avatar     = $player->images[0]->url;
-        $entry->player_email      = $player->email;
-        $entry->player_points     = 1;
-        $entry->save();
+        try {
+            // Check if the user already exists on the DB.
+            $foundPlayer = self::findPlayer($player->uri);
+            if (! empty(($foundPlayer))) {
+                return PlayerModel::expect($foundPlayer['player_id']);
+            }
+            // If not found yet, create a new player entry.
+            $entry                    = PlayerModel::getInstance()->getEntry();
+            $entry->player_flags      = 1;
+            $entry->player_spotify_id = $player->uri;
+            $entry->player_name       = $player->display_name;
+            $entry->email             = $player->email;
+            $entry->player_url        = $player->external_urls->spotify;
+            $entry->player_avatar     = $player->images[0]->url;
+            $entry->player_email      = $player->email;
+            $entry->player_points     = 1;
+            $entry->save();
 
-        return $entry;
+            return $entry;
+        } catch (Exception) {
+            throw new Exception("Player already exists.");
+        }
     }
 
     /**

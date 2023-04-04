@@ -1,6 +1,7 @@
 <?php declare(strict_types = 1);
 namespace noxkiwi\spotigame\Context;
 
+use noxkiwi\spotigame\Auth\SpotigameAuth;
 use noxkiwi\spotigame\Manipulator;
 
 /**
@@ -23,5 +24,13 @@ final class CrudContext extends \noxkiwi\crud\Context\CrudContext
     {
         parent::__construct();
         $this->setManipulator(new Manipulator($this->getCrud()));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isAllowed(): bool
+    {
+        return SpotigameAuth::isAdmin();
     }
 }

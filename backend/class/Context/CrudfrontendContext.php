@@ -2,6 +2,7 @@
 namespace noxkiwi\spotigame\Context;
 
 use noxkiwi\crud\Context\CrudfrontendContext as BaseCrudFrontendContext;
+use noxkiwi\spotigame\Auth\SpotigameAuth;
 
 /**
  * I am the frontend Context for the CRUD manager.
@@ -16,4 +17,11 @@ use noxkiwi\crud\Context\CrudfrontendContext as BaseCrudFrontendContext;
  */
 final class CrudfrontendContext extends BaseCrudFrontendContext
 {
+    /**
+     * @inheritDoc
+     */
+    public function isAllowed(): bool
+    {
+        return SpotigameAuth::isAdmin();
+    }
 }

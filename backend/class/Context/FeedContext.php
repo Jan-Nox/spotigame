@@ -5,6 +5,7 @@ use DateTime;
 use Exception;
 use noxkiwi\cache\Cache;
 use noxkiwi\core\Context;
+use noxkiwi\spotigame\Auth\SpotigameAuth;
 use noxkiwi\spotigame\Model\SongModel;
 use noxkiwi\spotigame\RemoteApi\Spotify;
 use noxkiwi\spotigame\Song\Song;
@@ -27,9 +28,11 @@ final class FeedContext extends Context
      */
     public function isAllowed(): bool
     {
-        parent::isAllowed();
+        if (! parent::isAllowed()) {
+            return false;
+        }
 
-        return true;
+        return SpotigameAuth::isAdmin();
     }
 
     /**

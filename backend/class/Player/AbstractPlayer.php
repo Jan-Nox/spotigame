@@ -20,4 +20,5 @@ abstract class AbstractPlayer extends AbstractEntity implements PlayerInterface
     public string $playerId;
     public string $avatar;
     public int    $points;
+    public array  $settings;
 }

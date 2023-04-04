@@ -2,6 +2,7 @@
 namespace noxkiwi\spotigame\Helper;
 
 use function array_rand;
+use function in_array;
 use function shuffle;
 
 /**
@@ -27,18 +28,16 @@ abstract class OptionHelper
      */
     public static function randomPick(array $context, string $correct, int $count): array
     {
-        $result = [];
-        for ($row = 1; $row <= $count - 1; $row++) {
-            $key    = array_rand($context);
-            $artist = $context[$key];
-            if ($artist === $correct) {
+        $picks = [$correct];
+        while (count($picks) <= $count-1) {
+            $randomPick = $context[array_rand($context)];
+            if (in_array($randomPick, $picks, true)) {
                 continue;
             }
-            $result[] = $artist;
+            $picks[] = $randomPick;
         }
-        $result[] = $correct;
-        shuffle($result);
+        shuffle($picks);
 
-        return $result;
+        return $picks;
     }
 }

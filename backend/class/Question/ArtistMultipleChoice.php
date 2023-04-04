@@ -21,9 +21,8 @@ use noxkiwi\spotigame\Vote\Vote;
  */
 final class ArtistMultipleChoice extends AbstractQuestion
 {
-    protected const PARAM_NAME  = 'artist';
     public const    QUESTION_ID = 1;
-    public string $question = 'artist_multiple_choice';
+    public const QUESTION = 'artist_multiple_choice';
     public string $emoji    = '🎤';
     public string $type     = 'select';
     public string $param    = 'artist';
@@ -55,13 +54,5 @@ final class ArtistMultipleChoice extends AbstractQuestion
         }
 
         return $answer;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function ask(Song $song): string
-    {
-        return 'NOT YET';
     }
 }

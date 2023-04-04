@@ -1,17 +1,21 @@
 <?php declare(strict_types = 1);
 namespace noxkiwi\spotigame\Context;
 
+use Exception;
 use InvalidArgumentException;
+use noxkiwi\core\Constants\Mvc;
 use noxkiwi\core\Context;
 use noxkiwi\core\Environment;
 use noxkiwi\dataabstraction\Exception\EntryMissingException;
 use noxkiwi\database\Database;
 use noxkiwi\spotigame\GameMode\GameMode;
 use noxkiwi\spotigame\Model\SittingModel;
+use noxkiwi\spotigame\Model\SittingPlayerModel;
 use noxkiwi\spotigame\Player\Player;
 use noxkiwi\spotigame\Sitting\Sitting;
 use function header;
 use function uniqid;
+use function var_dump;
 
 /**
  * I am the Context object that manages data transfer between Crud Frontend and Crud backend.
@@ -26,12 +30,19 @@ use function uniqid;
  */
 final class SittingContext extends Context
 {
+    private Player $player;
+
     /**
      * @inheritDoc
      */
     public function isAllowed(): bool
     {
         parent::isAllowed();
+        try {
+            $this->player = Player::identify();
+        } catch (Exception) {
+            return false;
+        }
 
         return true;
     }
@@ -107,10 +118,9 @@ SQL,
     protected function viewDashboard(): void
     {
         $e        = Environment::getInstance();
-        $hostName = $e->get('server>hostname');
+        $hostName = $e->get('server>hostname', 'https://spotigame.nox.kiwi/');
         try {
-            $player = Player::identify();
-            SittingModel::getInstance()->fetchSitting($player);
+            SittingModel::getInstance()->fetchSitting($this->player);
         } catch (EntryMissingException) {
             header("Location: $hostName?context=sitting&action=create");
 
@@ -135,6 +145,11 @@ SQL,
         $this->response->set($key, $db->getResult());
     }
 
+    protected function viewCreate(): void
+    {
+        $this->request->set(Mvc::TEMPLATE, 'game');
+    }
+
     /**
      * @throws \noxkiwi\core\Exception\InvalidArgumentException
      * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
@@ -144,20 +159,41 @@ SQL,
      */
     protected function actionCreate(): void
     {
-        $player  = Player::identify();
         $mode    = new GameMode();
         $sitting = new Sitting();
         $mode->setName('regular');
+        $sitting->stepCount = (int)$this->request->get('steps', 10);
         $sitting->setName(uniqid("SPOTIGAME_SITTING_"));
         $sitting->setGameMode($mode);
-        $sitting->addPlayer($player);
-        $sitting->init();
-        $sitting->getNextMove();
-        $this->session->set("sittingId$player->id", $sitting->id);
-        $this->session->remove('sittingId15');
-        $this->session->remove('sitting_id15');
+        $sitting->addPlayer($this->player);
+        $sitting->create();
+        // Put data into session
+        $this->session->set('CURRENT_STEP', 0);
+        $this->session->set('SITTING_ID', $sitting->sittingId);
+        $this->session->set('STEP_COUNT', $sitting->stepCount);
+        // Forward into game
         $e        = Environment::getInstance();
-        $hostName = $e->get('server>hostname');
+        $hostName = $e->get('server>hostname', 'https://spotigame.nox.kiwi/');
         header("Location: $hostName?context=game&view=ask");
+    }
+
+    protected function actionJoin(): void
+    {
+        $sitting = Sitting::expect((int)$this->request->get('sittingId'));
+        $sitting->addPlayer($this->player);
+        $newSittingPlayer = SittingPlayerModel::getInstance();
+        $newSittingPlayer->save([
+                                    'sitting_id'           => $sitting->id,
+                                    'player_id'            => $this->player->id,
+                                    'sitting_player_flags' => 1
+                                ]);
+        $e        = Environment::getInstance();
+        $hostName = $e->get('server>hostname', 'https://spotigame.nox.kiwi/');
+        // Put data to session
+        $this->session->set('CURRENT_STEP', 1);
+        $this->session->set('SITTING_ID', $sitting->id);
+        $this->session->set('STEP_COUNT', $sitting->stepCount);
+        header("Location: $hostName?context=game&view=ask");
+        die('A');
     }
 }

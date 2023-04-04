@@ -2,6 +2,8 @@
 
 namespace noxkiwi\spotigame;
 
+
+
 echo <<<HTML
 <div class="step" id="stepBox">
     <h4 style="width:100%;text-align:center;"></h4>

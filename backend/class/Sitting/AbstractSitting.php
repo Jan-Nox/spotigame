@@ -17,4 +17,9 @@ use noxkiwi\spotigame\Interfaces\SittingInterface;
 abstract class AbstractSitting extends AbstractEntity implements SittingInterface
 {
     protected const TYPE = 'sitting';
+    /** @var \noxkiwi\spotigame\Player\Player[] */
+    public array $players;
+    /** @var \noxkiwi\spotigame\Song\Song[] */
+    public array $songs;
+    public int $stepCount;
 }

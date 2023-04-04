@@ -21,9 +21,8 @@ use noxkiwi\spotigame\Vote\Vote;
  */
 final class AlbumMultipleChoice extends AbstractQuestion
 {
-    protected const PARAM_NAME  = 'album';
     public const    QUESTION_ID = 3;
-    public string $question = 'album_multiple_choice';
+    public const QUESTION = 'album_multiple_choice';
     public string $emoji    = '📀';
     public string $type     = 'select';
     public string $param    = 'album';
@@ -55,13 +54,5 @@ final class AlbumMultipleChoice extends AbstractQuestion
         }
 
         return $answer;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function ask(Song $song): string
-    {
-        return 'NOT YET';
     }
 }

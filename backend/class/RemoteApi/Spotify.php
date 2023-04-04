@@ -58,11 +58,8 @@ final class Spotify
     private function setSession(string $url): void
     {
         $e             = Environment::getInstance();
-        $this->session = new Session(
-            $e->get('spotify>id'),
-            $e->get('spotify>secret'),
-            "{$e->get('server>hostname')}$url"
-        );
+        $hostName      = $e->get('server>hostname', 'https://spotigame.nox.kiwi/');
+        $this->session = new Session('8b9825466a1248a88a3a71b451b7ff63', '561851eb17f546869b33607e454aa46b', "$hostName$url");
     }
 
     #[NoReturn] public function authenticate(): void

@@ -21,9 +21,8 @@ use noxkiwi\spotigame\Vote\Vote;
  */
 final class TitleMultipleChoice extends AbstractQuestion
 {
-    protected const PARAM_NAME  = 'title';
     public const    QUESTION_ID = 2;
-    public string $question = 'title_multiple_choice';
+    public const QUESTION = 'title_multiple_choice';
     public string $emoji    = '🎼';
     public string $type     = 'select';
     public string $param    = 'title';
@@ -55,13 +54,5 @@ final class TitleMultipleChoice extends AbstractQuestion
         }
 
         return $answer;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function ask(Song $song): string
-    {
-        return 'NOT YET';
     }
 }

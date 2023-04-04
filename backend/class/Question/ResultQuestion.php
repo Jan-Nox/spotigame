@@ -3,9 +3,6 @@ namespace noxkiwi\spotigame\Question;
 
 use noxkiwi\core\Request;
 use noxkiwi\spotigame\Answer\Answer;
-use noxkiwi\spotigame\Helper\OptionHelper;
-use noxkiwi\spotigame\Model\SongModel;
-use noxkiwi\spotigame\Song\Song;
 use noxkiwi\spotigame\Vote\Vote;
 
 /**
@@ -21,9 +18,7 @@ use noxkiwi\spotigame\Vote\Vote;
  */
 final class ResultQuestion extends AbstractQuestion
 {
-    protected const PARAM_NAME  = 'result';
-    public const    QUESTION_ID = -1;
-    public string $question = 'result';
+    public const QUESTION = 'result';
     public string $emoji    = '?';
     public string $type     = 'result';
 
@@ -41,13 +36,5 @@ final class ResultQuestion extends AbstractQuestion
         }
 
         return $answer;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function ask(Song $song): string
-    {
-        return 'NOT YET';
     }
 }

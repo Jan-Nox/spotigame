@@ -32,9 +32,9 @@ final class DatabaseTranslator extends Translator
      */
     public function getKeys(): array
     {
+        $ret = [];
         try {
             $database = Database::getInstance();
-            $ret      = [];
             $query    = <<<MYSQL
 SELECT `translation`.`translation_key` FROM `translation`;
 MYSQL;
@@ -72,12 +72,12 @@ MYSQL;
     protected function getTranslation(string $key): string
     {
         try {
-            $lm = TranslationModel::getInstance();
-            $tr = $lm->load($key);
+            $translation   = TranslationModel::expect($key);
+            $languageField = self::LANGUAGE_MAPPING[self::getLanguage()] ?? self::LANGUAGE_MAPPING[Translator::LANGUAGE_DE_DE];
 
-            return $tr[self::LANGUAGE_MAPPING[self::getLanguage()] ?? self::LANGUAGE_MAPPING[Translator::LANGUAGE_DE_DE]] ?? $key;
+            return $translation->{$languageField} ?? $key;
         } catch (Exception $exception) {
-            return $key . $exception->getMessage();
+            return $key;
         }
     }
 }

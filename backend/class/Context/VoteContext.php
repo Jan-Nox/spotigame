@@ -1,6 +1,7 @@
 <?php declare(strict_types = 1);
 namespace noxkiwi\spotigame\Context;
 
+use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use noxkiwi\core\Context;
 use noxkiwi\core\Helper\JsonHelper;
@@ -23,6 +24,7 @@ use function header;
 class VoteContext extends Context
 {
     private SittingModel $sittingModel;
+    private Player       $player;
 
     /**
      * @inheritDoc
@@ -41,6 +43,11 @@ class VoteContext extends Context
     public function isAllowed(): bool
     {
         parent::isAllowed();
+        try {
+            $this->player = Player::identify();
+        } catch (Exception) {
+            return false;
+        }
 
         return true;
     }
@@ -52,11 +59,10 @@ class VoteContext extends Context
     #[NoReturn] protected function actionVote(): void
     {
         // Fetch the sitting
-        $sitting = $this->getSitting();
         // Fetch the user's Vote
         $vote = $this->buildVote();
         // Fetch the current Move
-        $move = $sitting->getCurrentMove();
+        $move = $this->getSitting()->getCurrentMove();
         // Use the Move to evaluate the Vote
         $entry        = $move->evaluate($vote, $move);
         $vote->points = (int)$entry->vote_points;
@@ -78,7 +84,7 @@ class VoteContext extends Context
         $vote->artist  = (string)$this->request->get('artist');
         $vote->year    = (int)$this->request->get('year');
         $vote->album   = (string)$this->request->get('album');
-        $vote->player  = Player::identify();
+        $vote->player  = $this->player;
         $vote->sitting = $this->getSitting();
         $vote->move    = $vote->sitting->getCurrentMove();
 
@@ -86,13 +92,14 @@ class VoteContext extends Context
     }
 
     /**
-     * @throws \noxkiwi\core\Exception\InvalidArgumentException
-     * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
-     * @throws \noxkiwi\singleton\Exception\SingletonException
      * @return \noxkiwi\spotigame\Sitting\Sitting
      */
     protected function getSitting(): Sitting
     {
-        return $this->sittingModel->fetchSitting(Player::identify());
+        try {
+            return $this->sittingModel->fetchSitting($this->player);
+        } catch (Exception) {
+        }
+        exit(403);
     }
 }

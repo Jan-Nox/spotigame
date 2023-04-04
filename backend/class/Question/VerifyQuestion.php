@@ -3,9 +3,6 @@ namespace noxkiwi\spotigame\Question;
 
 use noxkiwi\core\Request;
 use noxkiwi\spotigame\Answer\Answer;
-use noxkiwi\spotigame\Helper\OptionHelper;
-use noxkiwi\spotigame\Model\SongModel;
-use noxkiwi\spotigame\Song\Song;
 use noxkiwi\spotigame\Vote\Vote;
 
 /**
@@ -21,11 +18,9 @@ use noxkiwi\spotigame\Vote\Vote;
  */
 final class VerifyQuestion extends AbstractQuestion
 {
-    protected const PARAM_NAME  = 'album';
-    public const    QUESTION_ID = -1;
-    public string $question = 'validate_question';
-    public string $emoji    = '?';
-    public string $type     = 'verify';
+    public const    QUESTION    = 'validate_question';
+    public string $emoji = '?';
+    public string $type  = 'verify';
 
     /**
      * @inheritDoc
@@ -41,13 +36,5 @@ final class VerifyQuestion extends AbstractQuestion
         }
 
         return $answer;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function ask(Song $song): string
-    {
-        return 'NOT YET';
     }
 }

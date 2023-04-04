@@ -1,6 +1,7 @@
 <?php declare(strict_types = 1);
 namespace noxkiwi\spotigame\Context;
 
+use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use noxkiwi\core\Context;
 use noxkiwi\core\Helper\JsonHelper;
@@ -23,6 +24,7 @@ use function header;
 class VoteContext extends Context
 {
     private SittingModel $sittingModel;
+    private Player       $player;
 
     /**
      * @inheritDoc
@@ -41,6 +43,11 @@ class VoteContext extends Context
     public function isAllowed(): bool
     {
         parent::isAllowed();
+        try {
+            $this->player = Player::identify();
+        } catch (Exception) {
+            return false;
+        }
 
         return true;
     }

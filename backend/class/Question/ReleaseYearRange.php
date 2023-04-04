@@ -3,7 +3,6 @@ namespace noxkiwi\spotigame\Question;
 
 use noxkiwi\core\Request;
 use noxkiwi\spotigame\Answer\Answer;
-use noxkiwi\spotigame\Song\Song;
 use noxkiwi\spotigame\Vote\Vote;
 
 /**
@@ -24,20 +23,11 @@ use noxkiwi\spotigame\Vote\Vote;
  */
 final class ReleaseYearRange extends AbstractQuestion
 {
-    protected const PARAM_NAME  = 'year';
     public const    QUESTION_ID = 4;
-    public string $question = 'release_year_range';
+    public const QUESTION = 'release_year_range';
     public string $emoji    = '🗓️';
     public string $type     = 'range';
     public string $param    = 'year';
-
-    /**
-     * @inheritDoc
-     */
-    public function ask(Song $song): string
-    {
-        return 'NOT YET, JAN!';
-    }
 
     /**
      * @inheritDoc

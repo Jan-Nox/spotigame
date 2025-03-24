@@ -1,4 +1,5 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
+
 namespace noxkiwi\spotigame\Model;
 
 use Exception;
@@ -6,7 +7,9 @@ use noxkiwi\cache\Cache;
 use noxkiwi\dataabstraction\Entry;
 use noxkiwi\dataabstraction\Model;
 use noxkiwi\database\Database;
-use noxkiwi\spotigame\Song\Song;
+use noxkiwi\spotigame\GameEntity\GameMode\GameMode;
+use noxkiwi\spotigame\MediaEntity\Song\AbstractSong;
+use noxkiwi\spotigame\MediaEntity\Song\Song;
 use function implode;
 use function in_array;
 
@@ -20,8 +23,7 @@ use function in_array;
  * @version      1.0.0
  * @link         https://nox.kiwi/
  */
-final class SongModel extends Model
-{
+final class SongModel extends Model {
     public const TABLE = 'song';
 
     /**
@@ -29,18 +31,70 @@ final class SongModel extends Model
      *
      * Otherwise we will just skip everything.
      *
-     * @param \noxkiwi\spotigame\Song\Song $song
+     * @param \noxkiwi\spotigame\MediaEntity\Song\Song $song
      *
-     * @throws \noxkiwi\core\Exception\InvalidArgumentException
+     * @return void
      * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
      * @throws \noxkiwi\singleton\Exception\SingletonException
-     * @return void
+     * @throws \noxkiwi\core\Exception\InvalidArgumentException
      */
-    public static function store(Song $song): void
-    {
+    public static function store(Song $song): void {
         $instance = new self();
-        $entry    = self::fetchEntry($song);
+        $entry = self::fetchEntry($song);
         $instance->saveEntry($entry);
+    }
+
+    /**
+     * From all the Songs we know in our own meta database, I will return ONE Random song instance.
+     *
+     * @param AbstractSong[] $excludedSongs
+     *
+     * @return \noxkiwi\spotigame\MediaEntity\Song\Song
+     * @throws \noxkiwi\database\Exception\DatabaseException
+     * @throws \noxkiwi\singleton\Exception\SingletonException
+     * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
+     */
+    public static function getRandomSongs(array $excludedSongs, GameMode $GameMode, int $count = 1, ?AbstractSong $correct = null): Song {
+        $limit = $count;
+
+        if ($correct) {
+            $limit = $count -1;
+        }
+
+        $exclude = '';
+        if ($excludedSongs) {
+            $exclude = 'WHERE  `song`.`song_id` NOT IN (' . implode(',', $excludedSongs ?? [0]) . ')';
+        }
+
+
+        $sql = <<<SQL
+SELECT `song_id`
+FROM   `song`
+    $exclude
+   AND `song`.`song_id` != $songId
+    
+{$GameMode->getTrackEverywhereFilter()}
+
+ORDER BY RAND() LIMIT {$limit}
+
+UNION ALL
+
+SELECT `song_id`
+FROM   `song`
+WHERE  `song`.`song_id` = $specificSongId
+    
+{$GameMode->getTrackEverywhereFilter()}
+SQL;
+        $db = Database::getInstance();
+        $db->read($sql);
+        $rows = $db->getResult();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result [] = Song::expect((int)$row[0]['song_id']);
+        }
+
+        return $result;
     }
 
     /**
@@ -48,27 +102,27 @@ final class SongModel extends Model
      *
      * @param array|null $excludedSongs
      *
-     * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
+     * @return \noxkiwi\spotigame\MediaEntity\Song\Song
      * @throws \noxkiwi\database\Exception\DatabaseException
      * @throws \noxkiwi\singleton\Exception\SingletonException
-     * @return \noxkiwi\spotigame\Song\Song
+     * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
      */
-    public static function getRandom(array $excludedSongs = null): Song
-    {
-        $excludedSongIds = implode(',', $excludedSongs ?? [0]);
-        $sql             = <<<SQL
-SELECT
-	`song_id`
-FROM
-	`song`
-WHERE TRUE
-	AND `song`.`song_flags` & 1 = 1
-	AND `song`.`song_id` NOT IN($excludedSongIds)
-    AND `song`.`song_year` != 2023
-ORDER BY RAND()
-LIMIT 1
+    public static function getRandom(array $excludedSongs, GameMode $GameMode, int $count = 1): Song {
+        $exclude = '';
+        if ($excludedSongs) {
+            $exclude = ' AND `song`.`song_id` NOT IN (' . implode(',', $excludedSongs ?? [0]) . ')';
+        }
+        $sql = <<<SQL
+SELECT `song_id`
+FROM   `song`
+WHERE TRUE  $exclude
+    
+{$GameMode->getTrackEverywhereFilter()}
+
+-- Yes use a random song
+ORDER BY RAND() LIMIT 1
 SQL;
-        $db              = Database::getInstance();
+        $db = Database::getInstance();
         $db->read($sql);
         $row = $db->getResult();
 
@@ -82,8 +136,7 @@ SQL;
      *
      * @return array
      */
-    public function fromCache(string $fieldName): array
-    {
+    public function fromCache(string $fieldName): array {
         try {
             return (array)Cache::getInstance()->get('SPOTIGAME_META', $fieldName);
         } catch (Exception) {
@@ -95,12 +148,11 @@ SQL;
      * I will put the given $list into the meta cache.
      *
      * @param string $fieldName
-     * @param array  $list
+     * @param array $list
      *
      * @return void
      */
-    public function toCache(string $fieldName, array $list): void
-    {
+    public function toCache(string $fieldName, array $list): void {
         try {
             Cache::getInstance()->set('SPOTIGAME_META', $fieldName, $list);
         } catch (Exception) {
@@ -112,24 +164,23 @@ SQL;
      *
      * This will be stored in cache.
      *
-     * @see \noxkiwi\spotigame\Model\SongModel::toCache()
-     * @see \noxkiwi\spotigame\Model\SongModel::fromCache()
-     *
      * @param string $fieldName
      *
      * @return array
+     * @see \noxkiwi\spotigame\Model\SongModel::toCache()
+     * @see \noxkiwi\spotigame\Model\SongModel::fromCache()
+     *
      */
-    public function getList(string $fieldName): array
-    {
+    public function getList(string $fieldName): array {
         $list = $this->fromCache($fieldName);
-        if (! empty($list)) {
+        if (!empty($list)) {
             return $list;
         }
         $songs = $this->search();
-        $list  = [];
+        $list = [];
         foreach ($songs as $song) {
-            if (! in_array($song[$fieldName], $list, true)) {
-                $list[] = $song[$fieldName];
+            if (!in_array($song[$fieldName], $list, true)) {
+                $list[$song['song_spotifyid']] = $song[$fieldName];
             }
         }
         $this->toCache($fieldName, $list);
@@ -140,12 +191,11 @@ SQL;
     /**
      * I will utilize the given $song's SpotifyID to verify whether we already possess meta on the given $song or not.
      *
-     * @param \noxkiwi\spotigame\Song\Song $song
+     * @param \noxkiwi\spotigame\MediaEntity\Song\Song $song
      *
      * @return int
      */
-    public static function getId(Song $song): int
-    {
+    public static function getId(Song $song): int {
         $instance = new self();
         $instance->addFilter('song_spotifyid', $song->spotifyId);
 
@@ -155,31 +205,30 @@ SQL;
     /**
      * From the given $song I will create an UNSAVED Entry object that MAY be saved.
      *
-     * @param \noxkiwi\spotigame\Song\Song $song
+     * @param \noxkiwi\spotigame\MediaEntity\Song\Song $song
      *
-     * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
-     * @throws \noxkiwi\singleton\Exception\SingletonException
      * @return \noxkiwi\dataabstraction\Entry
+     * @throws \noxkiwi\singleton\Exception\SingletonException
+     * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
      */
-    private static function fetchEntry(Song $song): Entry
-    {
+    private static function fetchEntry(Song $song): Entry {
         $songId = self::getId($song);
-        if (! empty($songId)) {
+        if (!empty($songId)) {
             $entry = self::expect($songId);
         } else {
             $instance = new self();
-            $entry    = $instance->getEntry();
+            $entry = $instance->getEntry();
         }
-        $entry->song_title      = $song->title;
-        $entry->song_spotifyid  = $song->spotifyId;
-        $entry->song_artist     = $song->artist;
-        $entry->song_album      = $song->album;
-        $entry->song_year       = $song->year;
-        $entry->song_track      = $song->track;
+        $entry->song_title = $song->title;
+        $entry->song_spotifyid = $song->spotifyId;
+        $entry->song_artist = $song->artist;
+        $entry->song_album = $song->album;
+        $entry->song_year = $song->year;
+        $entry->song_track = $song->track;
         $entry->song_popularity = $song->popularity;
-        $entry->song_image      = $song->image;
-        $entry->song_duration   = $song->duration;
-        $entry->category_id     = 1;
+        $entry->song_image = $song->image;
+        $entry->song_duration = $song->duration;
+        $entry->category_id = 1;
 
         return $entry;
     }

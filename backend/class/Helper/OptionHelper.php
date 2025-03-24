@@ -1,8 +1,8 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
+
 namespace noxkiwi\spotigame\Helper;
 
-use function array_rand;
-use function shuffle;
+use noxkiwi\spotigame\Entity\AbstractEntity;
 
 /**
  * I am the Option helper. I will help generating options and lists.
@@ -19,26 +19,43 @@ abstract class OptionHelper
     /**
      * I will randomly pick $count-1 elements from $context the $correct one before shuffling the result.
      *
-     * @param array  $context I am the list of possible values to select from.
+     * @param array $context I am the list of possible values to select from.
      * @param string $correct I am the correct value that will always be added to the list.
-     * @param int    $count   I am the count of entries to return from the given $list.
+     * @param int $count I am the count of entries to return from the given $list.
      *
      * @return array
      */
-    public static function randomPick(array $context, string $correct, int $count): array
+    public static function randomPick(array $context, AbstractEntity $correct, int $count): array
     {
-        $result = [];
-        for ($row = 1; $row <= $count - 1; $row++) {
-            $key    = array_rand($context);
-            $artist = $context[$key];
-            if ($artist === $correct) {
+        $picks[] = [
+            'label' => $correct->name,
+            'value' => $correct->uuid
+        ];
+        while (count($picks) <= $count - 1) {
+            $randomPickKey = array_rand($context);
+            if (array_key_exists($randomPickKey, $picks)) {
                 continue;
             }
-            $result[] = $artist;
+            $picks[$randomPickKey] = [
+                'label' => $context[$randomPickKey],
+                'value' => $randomPickKey
+            ];
         }
-        $result[] = $correct;
-        shuffle($result);
+        $picks = self::shuffle_assoc($picks);
 
-        return $result;
+        return array_values($picks);
+    }
+
+    public static function shuffle_assoc(array $list): array
+    {
+        if (!is_array($list)) return $list;
+
+        $keys = array_keys($list);
+        shuffle($keys);
+        $random = [];
+        foreach ($keys as $key) {
+            $random[$key] = $list[$key];
+        }
+        return $random;
     }
 }

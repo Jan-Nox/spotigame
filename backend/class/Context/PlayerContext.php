@@ -1,8 +1,13 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
+
 namespace noxkiwi\spotigame\Context;
 
+use Exception;
+use noxkiwi\core\Constants\Mvc;
 use noxkiwi\core\Context;
 use noxkiwi\database\Database;
+use noxkiwi\spotigame\Auth\SpotigameAuth;
+use noxkiwi\spotigame\GameEntity\Player\Player;
 
 /**
  * I am the Context object that manages data transfer between Crud Frontend and Crud backend.
@@ -15,77 +20,61 @@ use noxkiwi\database\Database;
  * @version      1.0.0
  * @link         https://nox.kiwi/
  */
-final class PlayerContext extends Context
+final class PlayerContext extends AuthenticatedSpotigameContext
 {
 
     /**
-     * @inheritDoc
-     */
-    public function isAllowed(): bool
-    {
-        parent::isAllowed();
-
-        return true;
-    }
-
-    /**
-     * @throws \noxkiwi\database\Exception\DatabaseException
-     * @throws \noxkiwi\singleton\Exception\SingletonException
+     * I will solely search for the desired Player's details.
      * @return void
      */
     public function viewInfo(): void
     {
-        $this->response->set('points', $this->getPoints());
-        $this->response->set('sittings', $this->getSittings());
+        try {
+
+            $this->request->set(Mvc::TEMPLATE, 'game');
+            $player = Player::identify();
+            // If you're an admin, you may want to see a different Player's info.
+            if (SpotigameAuth::isAdmin() && (int)$this->request->get('playerId', $player->playerId) !== $player->id) {
+                $player = Player::expect((int)$this->request->get('playerId', $player->playerId));
+            }
+            $this->response->set('player', $player);
+            $this->response->set('sittings', $this->getSittings($player));
+        } catch (Exception) {
+            // Do nothing.
+        }
     }
 
     /**
-     * @throws \noxkiwi\database\Exception\DatabaseException
-     * @throws \noxkiwi\singleton\Exception\SingletonException
-     * @return int
-     */
-    public function getPoints(): int
-    {
-        $db  = Database::getInstance();
-        $sql = <<<SQL
-SELECT
-	SUM(`vote`.`vote_points`) AS `count`
-FROM 	`vote`
-WHERE TRUE
-	AND `vote`.`player_id` = 2;
-;
-SQL;
-        $db->read($sql);
-
-        return (int)($db->getResult()[0]['count'] ?? 0);
-    }
-
-    /**
-     * @throws \noxkiwi\database\Exception\DatabaseException
-     * @throws \noxkiwi\singleton\Exception\SingletonException
+     * I will return the list of existing sittings with the given Player inside.
+     *
+     * @param \noxkiwi\spotigame\Player\Player $player
+     *
      * @return array
+     * @throws \noxkiwi\singleton\Exception\SingletonException
+     * @throws \noxkiwi\database\Exception\DatabaseException
      */
-    public function getSittings(): array
+    private function getSittings(Player $player): array
     {
-        $db  = Database::getInstance();
+        $db = Database::getInstance();
         $sql = <<<SQL
 SELECT
 	SUM(`vote`.`vote_points`) AS `sitting_points`,
+	`sitting`.`sitting_steps`,
+	`sitting`.`sitting_code`,
 	`sitting`.`sitting_id`,
-	`vote`.`vote_flags`,
-	`player`.`player_name`,
-	`song`.`song_title`,
-	`sitting`.`sitting_code`
+	`sitting`.`sitting_code`,
+	2 AS `sitting_players`
 FROM
 	`vote`
 JOIN	`player`  USING (`player_id`)
 JOIN	`move`    USING (`move_id`)
-JOIN	`song`    USING (`song_id`)
 JOIN    `sitting` USING (`sitting_id`)
 WHERE TRUE
-    AND `player`.`player_id` = 2
+    AND `player`.`player_id` = $player->playerId
 GROUP BY 
 	`sitting`.`sitting_id`
+ORDER BY
+    `sitting`.`sitting_id` DESC
 ;
 SQL;
         $db->read($sql);

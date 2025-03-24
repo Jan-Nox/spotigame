@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
-namespace noxkiwi\spotigame;
+namespace noxkiwi\spotigame\Result;
 
-use noxkiwi\core\Helper\LinkHelper;
+use noxkiwi\spotigame\MediaEntity\Song\Song;
 
 /**
  * I am the spotigame App.
@@ -13,6 +13,8 @@ use noxkiwi\core\Helper\LinkHelper;
  * @version      1.0.0
  * @link         https://nox.kiwi/
  */
-final class App extends \noxkiwi\core\App
+final class SongResult
 {
+    public Song $song;
+    public array $questions;
 }

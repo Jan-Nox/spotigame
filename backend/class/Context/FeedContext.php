@@ -1,13 +1,19 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
+
 namespace noxkiwi\spotigame\Context;
 
 use DateTime;
 use Exception;
 use noxkiwi\cache\Cache;
 use noxkiwi\core\Context;
+use noxkiwi\core\Helper\LinkHelper;
+use noxkiwi\spotigame\Auth\SpotigameAuth;
+use noxkiwi\spotigame\Helper\SpotifyRedirect;
+use noxkiwi\spotigame\MediaEntity\Album\Album;
+use noxkiwi\spotigame\MediaEntity\Artist\Artist;
 use noxkiwi\spotigame\Model\SongModel;
 use noxkiwi\spotigame\RemoteApi\Spotify;
-use noxkiwi\spotigame\Song\Song;
+use noxkiwi\spotigame\MediaEntity\Song\Song;
 
 /**
  * I am the Context object that manages data transfer between Crud Frontend and Crud backend.
@@ -20,56 +26,251 @@ use noxkiwi\spotigame\Song\Song;
  * @version      1.0.0
  * @link         https://nox.kiwi/
  */
-final class FeedContext extends Context
-{
-    /**
-     * @inheritDoc
-     */
-    public function isAllowed(): bool
-    {
-        parent::isAllowed();
+final class FeedContext extends Context {
+    private Cache $Cache;
 
-        return true;
+    protected function __construct() {
+        parent::__construct();
+
+        $this->Cache = Cache::getInstance();
     }
 
     /**
-     * @throws \noxkiwi\singleton\Exception\SingletonException
+     * @inheritDoc
+     */
+    public function isAllowed(): bool {
+        return true;
+    }
+
+    private function getFromCache(string $key): mixed {
+        $value = $this->request->get($key, null);
+        if ($value !== null) {
+            $this->Cache->set($key, $key, $value);
+            return $value;
+        }
+
+        $value = $this->Cache->get($key, $key);
+        return $value;
+    }
+
+    /**
+     * I will fetch all tracks from the given Album.
+     * Those will be feeded to the Track Import MessageQueue
      * @return void
      */
-    public function actionPlaylist(): void
-    {
-        $cache = Cache::getInstance();
-        if ($this->request->exists('offset')) {
-            $cache->set('offset', 'offset', max((int)$this->request->get('offset', 0), 0));
+    protected function actionAlbum(): void {
+
+        $albumUri = $this->getFromCache('albumUri');
+        if (empty($albumUri)) {
+            throw new \InvalidArgumentException('albumUri not found');
         }
-        if ($this->request->exists('playlistUri')) {
-            $cache->set('playlistUri', 'playlistUri', (string)$this->request->get('playlistUri'));
+        $albumOffset = (int)$this->getFromCache('albumOffset');
+
+        $cacheKey = "{$albumUri}_{$albumOffset}";
+
+        $spotifyResponse = $this->Cache->get('actionAlbum', $cacheKey);
+        if (empty($spotifyResponse)) {
+            $spotify = new Spotify(SpotifyRedirect::TO_ALBUM_IMPORT);
+            $spotifyResponse = $spotify->getAlbumTracks($albumUri, $albumOffset);
+            $this->Cache->set('actionAlbum', $cacheKey, $spotifyResponse);
         }
-        $playlistUri = (string)$cache->get('playlistUri', 'playlistUri');
-        $offset      = (int)$cache->get('offset', 'offset');
-        // FETCH DATA
-        $spotify = new Spotify('?context=feed&action=playlist');
-        //
-        $tracks = $spotify->getTracks($playlistUri, $offset);
-        foreach ($tracks->items as $track) {
-            echo '<pre>';
-            $song             = new Song();
-            $song->title      = $track->track->name;
-            $song->artist     = $track->track->artists[0]->name;
-            $song->spotifyId  = $track->track->id;
-            $song->album      = $track->track->album->name;
-            $song->name       = $track->track->name;
-            $song->track      = $track->track->track_number;
-            $song->popularity = $track->track->popularity;
-            $song->duration   = (int)($track->track->duration_ms ?? 0);
-            $song->image      = '';
-            try {
-                $song->year = (int)(new DateTime($track->track->album->release_date))->format('Y');
-                SongModel::store($song);
-                echo chr(10) . "$song has been imported.";
-            } catch (Exception) {
-                //IGNORE NOW FOR FEEDING 🍔
+
+        var_dump($spotifyResponse);
+    }
+
+    /**
+     * I will fetch all tracks from the given Playlist.
+     * Those will be feeded to the Track Import MessageQueue
+     *
+     * @return void
+     * @throws \noxkiwi\singleton\Exception\SingletonException
+     *
+     * https://open.spotify.com/playlist/
+     * https://spotigame.nox.kiwi/?context=feed&action=playlist&playlistUri=43E6gAUpfFFOWepKcZ6LfA&playlistOffset=
+     */
+    public function actionPlaylist(): void {
+        $playlistUri = $this->getFromCache('playlistUri');
+        if (empty($playlistUri)) {
+            throw new \InvalidArgumentException('playlistUri not found');
+        }
+
+        $playlistOffset = (int)$this->getFromCache('playlistOffset');
+
+        $cacheKey = "{$playlistUri}_{$playlistOffset}";
+
+        $spotifyResponse = $this->Cache->get('actionPlaylist', $cacheKey);
+        if (empty($spotifyResponse)) {
+            $spotify = new Spotify(SpotifyRedirect::TO_PLAYLIST_IMPORTER);
+            $spotifyResponse = $spotify->getTracks($playlistUri, $playlistOffset);
+            $this->Cache->set('actionPlaylist', $cacheKey, $spotifyResponse);
+        }
+
+        // Find songs that we already know but havent imported yet.
+        $foundSongIds = $this->Cache->get('foundSongs', 'foundSongs') ?? [];
+
+
+        // Attach all new songs to that list.
+        foreach ($spotifyResponse->items as $track) {
+            $foundSongIds[] = $track->track->id;
+        }
+        $foundSongIds = array_unique($foundSongIds);
+
+        $nextOffset = $playlistOffset + 100;
+        $this->Cache->set('foundSongs', 'foundSongs', $foundSongIds);
+        // Finally force the client to the import page without the code parameter to prevent 403 from spotify API
+        die(<<<HTML
+<a href="https://spotigame.nox.kiwi/?context=feed&action=playlist&playlistUri=$playlistUri&playlistOffset=$nextOffset">Nächster Song</a>
+https://spotigame.nox.kiwi/?context=feed&action=playlist&playlistUri=$playlistUri&playlistOffset=$nextOffset
+<script>
+window.location.href='https://spotigame.nox.kiwi/?context=feed&action=playlist&playlistUri=$playlistUri&playlistOffset=$nextOffset';
+</script>
+HTML
+        );
+    }
+
+
+    /**
+     * As long as there's no good queue system in place, we will use this to skip a song which breaks the import.
+     * @return void
+     */
+    protected function actionSkipSong() {
+
+        $trackId = $this->getFromCache('trackId') ?? '';
+        // IF NO SONG WAS STARTED TO IMPORT
+
+        // Fetch all songs
+        $foundSongIds = $this->Cache->get('foundSongs', 'foundSongs') ?? [];
+
+        if (empty($trackId)) {
+            // Use the first song.
+            $trackId = $foundSongIds[0];
+
+            $this->Cache->set('trackId', 'trackId', $trackId);
+        }
+        // remove $foundSongIds at position where value equals $trackId
+        if (($index = array_search($trackId, $foundSongIds)) !== false) {
+            unset($foundSongIds[$index]);
+        }
+        $foundSongIds = array_values($foundSongIds);
+
+        // Store the new list of $foundSongIds without the current trackId so we know that import was successful
+        $this->Cache->set('foundSongs', 'foundSongs', $foundSongIds);
+
+        // Also invalidate the cache for the current trackId to make the import proceed.
+        $this->Cache->set('trackId', 'trackId', null);
+
+    }
+
+    /**
+     * I will solely return the list of track IDs on the faked queue.
+     * @return void
+     */
+    protected function actionGetSongs() {
+        // Fetch all songs
+        $foundSongIds = $this->Cache->get('foundSongs', 'foundSongs') ?? [];
+        $count = count($foundSongIds);
+
+        echo "<pre>{$count} songs queued for import:";
+        foreach ($foundSongIds as  $index => $songId) {
+            echo PHP_EOL . "{$index}   =>  {$songId}";
+        }
+
+    }
+
+    /**
+     * I am the handler that imports a specific track.
+     * @return void
+     */
+    protected function actionTrack() {
+        $trackId = $this->getFromCache('trackId') ?? '';
+        // IF NO SONG WAS STARTED TO IMPORT
+
+        // Fetch all songs
+        $foundSongIds = $this->Cache->get('foundSongs', 'foundSongs') ?? [];
+
+        if (empty($trackId)) {
+            // Use the first song.
+            $trackId = $foundSongIds[0];
+
+            $this->Cache->set('trackId', 'trackId', $trackId);
+        }
+
+        try {
+            // remove $foundSongIds at position where value equals $trackId
+            if (($index = array_search($trackId, $foundSongIds)) !== false) {
+                unset($foundSongIds[$index]);
             }
+
+            // Fetch the track data from Spotify API
+            $trackData = $this->fetchTrack($trackId);
+
+            // Import the trackdata.
+            $this->importTrack($trackData);
+            $foundSongIds = array_values($foundSongIds);
+
+            // Store the new list of $foundSongIds without the current trackId so we know that import was successful
+            $this->Cache->set('foundSongs', 'foundSongs', $foundSongIds);
+
+            // Also invalidate the cache for the current trackId to make the import proceed.
+            $this->Cache->set('trackId', 'trackId', null);
+
+            #         LinkHelper::forward('?context=feed&action=track');
+        } catch (Exception $e) {
+            echo <<<HTML
+<h3>Error during import of $trackId</h3>
+HTML;
+
+            var_dump($e->getMessage());
+            die();
+        }
+        // Finally force the client to the import page without the code parameter to prevent 403 from spotify API
+        die(<<<HTML
+Track #$trackId was imported successfully.
+<script>
+window.location.href='https://spotigame.nox.kiwi/?context=feed&action=track';
+</script>
+HTML
+        );
+
+
+    }
+
+
+    // I just fetch the data.
+    private function fetchTrack(string $trackId): \stdClass {
+        // Cache it.
+
+        $spotifyResponse = $this->Cache->get('actionTrack', $trackId);
+        if (empty($spotifyResponse)) {
+            $spotify = new Spotify(SpotifyRedirect::TO_TRACK_IMPORTER);
+            $spotifyResponse = $spotify->getTrack($trackId);
+            $this->Cache->set('actionTrack', $trackId, $spotifyResponse);
+        }
+
+        return $spotifyResponse;
+    }
+
+    // I solely run the import of the data.
+    private function importTrack(\stdClass $track): void {
+        try {
+            // Update the Song.
+            $Song = new Song();
+            $Song->title = $track->name;
+            $Song->artist = new Artist();
+            $Song->artist->name = $track->artists[0]->name;
+            $Song->album = new Album();
+            $Song->album->name = $track->album->name;
+            $Song->album->cover = $track->album->images[0]->url;
+            $Song->spotifyId = $track->id;
+            $Song->name = $track->name;
+            $Song->track = $track->track_number;
+            $Song->popularity = $track->popularity;
+            $Song->duration = (int)($track->duration_ms ?? 0);
+            $Song->year = (int)(new DateTime($track->album->release_date))->format('Y');
+
+            $Song->save();
+        } catch (Exception) {
+            //IGNORE NOW FOR FEEDING 🍔
         }
     }
 }

@@ -1,10 +1,8 @@
 <?php declare(strict_types = 1);
-namespace noxkiwi\spotigame;
-
-use noxkiwi\core\Helper\LinkHelper;
+namespace noxkiwi\spotigame\Exception;
 
 /**
- * I am the spotigame App.
+ * I am the Exception that is thrown when the Game is over.
  *
  * @package      noxkiwi\spotigame
  * @author       Jan Nox <jan@nox.kiwi>
@@ -13,6 +11,6 @@ use noxkiwi\core\Helper\LinkHelper;
  * @version      1.0.0
  * @link         https://nox.kiwi/
  */
-final class App extends \noxkiwi\core\App
+final class GameOverException extends \Exception
 {
 }

@@ -1,10 +1,11 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
+
 namespace noxkiwi\spotigame\RemoteApi;
 
 use JetBrains\PhpStorm\NoReturn;
 use noxkiwi\core\Environment;
 use noxkiwi\core\Helper\WebHelper;
-use noxkiwi\spotigame\Song\Song;
+use noxkiwi\spotigame\MediaEntity\Song\Song;
 use SpotifyWebAPI\Session;
 use SpotifyWebAPI\SpotifyWebAPI;
 use stdClass;
@@ -23,7 +24,7 @@ use function header;
 final class Spotify
 {
     private SpotifyWebAPI $webAPI;
-    private Session       $session;
+    private Session $session;
 
     /**
      * @param string $url
@@ -49,20 +50,43 @@ final class Spotify
         return $this->webAPI->getPlaylistTracks($playlistId, ['limit' => 100, 'offset' => $offset]);
     }
 
+    public function getAlbumTracks(string $albumId, int $offset = 0): mixed
+    {
+        if (empty($_GET['code'])) {
+            $this->authenticate();
+
+            return new stdClass();
+        }
+        $this->session->requestAccessToken($_GET['code']);
+        $this->webAPI->setAccessToken($this->session->getAccessToken());
+
+        return $this->webAPI->getAlbumTracks($albumId, ['limit' => 100, 'offset' => $offset]);
+    }
+
+    public function getTrack(string $trackId): mixed
+    {
+        if (empty($_GET['code'])) {
+            $this->authenticate();
+
+            return new stdClass();
+        }
+        $this->session->requestAccessToken($_GET['code']);
+        $this->webAPI->setAccessToken($this->session->getAccessToken());
+
+        return $this->webAPI->getTrack($trackId);
+    }
+
     /**
      * @param string $url
      *
-     * @throws \noxkiwi\singleton\Exception\SingletonException
      * @return void
+     * @throws \noxkiwi\singleton\Exception\SingletonException
      */
     private function setSession(string $url): void
     {
-        $e             = Environment::getInstance();
-        $this->session = new Session(
-            $e->get('spotify>id'),
-            $e->get('spotify>secret'),
-            "{$e->get('server>hostname')}$url"
-        );
+        $e = Environment::getInstance();
+        $hostName = $e->get('server>hostname', 'https://spotigame.nox.kiwi/');
+        $this->session = new Session('8b9825466a1248a88a3a71b451b7ff63', '561851eb17f546869b33607e454aa46b', "$hostName$url");
     }
 
     #[NoReturn] public function authenticate(): void

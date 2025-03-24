@@ -5,8 +5,8 @@ use noxkiwi\core\Exception;
 use noxkiwi\core\Exception\AuthenticationException;
 use noxkiwi\core\Session;
 use noxkiwi\dataabstraction\Model;
-use noxkiwi\spotigame\Player\Player;
-use noxkiwi\spotigame\Sitting\Sitting;
+use noxkiwi\spotigame\GameEntity\Player\Player;
+use noxkiwi\spotigame\GameEntity\Sitting\Sitting;
 use function uniqid;
 
 /**
@@ -29,59 +29,35 @@ final class SittingModel extends Model
      * @throws \noxkiwi\core\Exception\AuthenticationException
      * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
      * @throws \noxkiwi\singleton\Exception\SingletonException
-     * @return \noxkiwi\spotigame\Sitting\Sitting
+     * @return \noxkiwi\spotigame\GameEntity\Sitting\Sitting
      */
-    private function getOpenSitting(Player $player): Sitting
+    private function getOpenSitting(Player $Player): Sitting
     {
         $session   = Session::getInstance();
-        $sittingId = (int)$session->get("sittingId$player->id", -1);
+        $sittingId = (int)$session->get('SITTING_ID', -1);
         if ($sittingId <= 0) {
-            throw new AuthenticationException("No open sitting for player $player->id", 42);
+            throw new AuthenticationException("No open sitting for player $Player->id", 42);
         }
-        $entry         = self::expect($sittingId);
-        $sitting       = new Sitting();
-        $sitting->id   = (int)$entry->sitting_id;
-        $sitting->name = $entry->sitting_code;
-
+        $entry              = self::expect($sittingId);
+        $sitting            = new Sitting();
+        $sitting->id        = (int)$entry->sitting_id;
+        $sitting->name      = $entry->sitting_code;
+        $sitting->stepCount = (int)$entry->sitting_steps;
+        $sitting->finished  = ((int)$entry->sitting_flags & 2) === 2;
+        $sitting->sittingId = (int)$entry->sitting_id;
+        $sitting->Player = $Player;
         return $sitting;
     }
 
     /**
-     * I will solely create a new Sitting for the given $player.
-     *
-     * @param \noxkiwi\spotigame\Player\Player $player
+     * @param \noxkiwi\spotigame\GameEntity\Player\Player $player
      *
      * @throws \noxkiwi\core\Exception\InvalidArgumentException
      * @throws \noxkiwi\singleton\Exception\SingletonException
-     * @return \noxkiwi\spotigame\Sitting\Sitting
-     */
-    private function createSitting(Player $player): Sitting
-    {
-        $entry               = $this->getEntry();
-        $entry->sitting_code = uniqid('sitting_');
-        $entry->save();
-        $sitting       = new Sitting();
-        $sitting->id   = (int)$entry->sitting_id;
-        $sitting->name = $entry->sitting_code;
-        $session       = Session::getInstance();
-        $session->set("sittingId$player->id", $sitting->id);
-
-        return $sitting;
-    }
-
-    /**
-     * @param \noxkiwi\spotigame\Player\Player $player
-     *
-     * @throws \noxkiwi\core\Exception\InvalidArgumentException
-     * @throws \noxkiwi\singleton\Exception\SingletonException
-     * @return \noxkiwi\spotigame\Sitting\Sitting
+     * @return \noxkiwi\spotigame\GameEntity\Sitting\Sitting
      */
     public function fetchSitting(Player $player): Sitting
     {
-        try {
-            return $this->getOpenSitting($player);
-        } catch (Exception) {
-            return $this->createSitting($player);
-        }
+        return $this->getOpenSitting($player);
     }
 }

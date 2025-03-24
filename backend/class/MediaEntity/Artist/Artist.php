@@ -1,18 +1,18 @@
 <?php declare(strict_types = 1);
-namespace noxkiwi\spotigame;
+namespace noxkiwi\spotigame\MediaEntity\Artist;
 
-use noxkiwi\core\Helper\LinkHelper;
+use noxkiwi\spotigame\Entity\AbstractEntity;
 
 /**
- * I am the spotigame App.
+ * I am a real Artist Entity.
  *
- * @package      noxkiwi\spotigame
+ * @package      noxkiwi\spotigame\MediaEntity\Artist
  * @author       Jan Nox <jan@nox.kiwi>
  * @license      https://nox.kiwi/license
  * @copyright    2023 noxkiwi
  * @version      1.0.0
  * @link         https://nox.kiwi/
  */
-final class App extends \noxkiwi\core\App
+final class Artist extends AbstractEntity
 {
 }

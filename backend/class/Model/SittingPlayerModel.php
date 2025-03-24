@@ -2,8 +2,8 @@
 namespace noxkiwi\spotigame\Model;
 
 use noxkiwi\dataabstraction\Model;
-use noxkiwi\spotigame\Player\Player;
-use noxkiwi\spotigame\Sitting\Sitting;
+use noxkiwi\spotigame\GameEntity\Player\Player;
+use noxkiwi\spotigame\GameEntity\Sitting\Sitting;
 
 /**
  * I am the storage for all Sitting<->Player relations.
@@ -20,7 +20,7 @@ final class SittingPlayerModel extends Model
     public const TABLE = 'sitting_player';
 
     /**
-     * @param \noxkiwi\spotigame\Sitting\Sitting $sitting
+     * @param \noxkiwi\spotigame\GameEntity\Sitting\Sitting $sitting
      *
      * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
      * @throws \noxkiwi\singleton\Exception\SingletonException

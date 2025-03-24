@@ -70,7 +70,7 @@ JOIN    `move`    USING (`move_id`)
 JOIN    `sitting` USING (`sitting_id`)
 WHERE TRUE
     AND `player`.`player_id` = $player->playerId
-GROUP BY 
+GROUP BY
     `sitting`.`sitting_id`
 ORDER BY
     `sitting`.`sitting_id` DESC

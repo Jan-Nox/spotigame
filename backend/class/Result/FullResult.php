@@ -110,7 +110,7 @@ FROM
     `answer`
 JOIN vote USING (vote_id)
 JOIN move USING (move_id)
-WHERE TRUE 
+WHERE TRUE
     AND move.sitting_id = {$this->Sitting->id}
 
 ORDER BY

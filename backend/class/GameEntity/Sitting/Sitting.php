@@ -227,7 +227,7 @@ FROM
     `sitting_player`
 WHERE TRUE
     AND `sitting_player`.`sitting_id` = $this->sittingId
-    AND (`sitting_player`.`sitting_player_flags` & (2) = 0) 
+    AND (`sitting_player`.`sitting_player_flags` & (2) = 0)
 SQL;
         $db = Database::getInstance();
         $db->read($sql);

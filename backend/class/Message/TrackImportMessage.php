@@ -6,7 +6,7 @@ use noxkiwi\queue\Message;
 
 /**
  * I am a Message object that is used to query the Spotify API for track details.
- * 
+ *
  * @package      noxkiwi\spotigame\Message
  * @author       Jan Nox <jan@nox.kiwi>
  * @license      https://nox.kiwi/license

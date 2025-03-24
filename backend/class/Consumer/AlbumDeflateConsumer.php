@@ -6,13 +6,14 @@ use noxkiwi\core\Exception\InvalidArgumentException;
 use noxkiwi\queue\Consumer\RabbitmqConsumer;
 use noxkiwi\queue\Message;
 use noxkiwi\spotigame\Message\AlbumDeflateMessage;
+use \Exception;
 use const E_USER_NOTICE;
 
 /**
  * I am the consumer that processes Albums.
- * 
+ *
  * As soon as I get my hands on a AlbumDeflateMessage, I will query the Spotify API for the Album details.
- * 
+ *
  * Then I'll create a TrackImportMessage for each track in the Album
  *
  * @package      noxkiwi\spotigame\Message
@@ -43,10 +44,11 @@ final class AlbumDeflateConsumer extends RabbitmqConsumer {
         }
 
         try {
-
+            // Do nothing for now.
         } catch (Exception) {
             //IGNORE NOW FOR FEEDING 🍔
         }
+
         return true;
     }
 

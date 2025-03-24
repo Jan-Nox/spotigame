@@ -28,7 +28,8 @@ use const E_WARNING;
  * @version      1.0.0
  * @link         https://nox.kiwi/
  */
-final class Sitting extends AbstractEntity {
+final class Sitting extends AbstractEntity
+{
     protected const TYPE = 'sitting';
     /** @var \noxkiwi\spotigame\GameEntity\Player\Player[] */
     public array $players;
@@ -48,7 +49,8 @@ final class Sitting extends AbstractEntity {
     private array $playedSongs = [];
     public Player $Player;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->session = Session::getInstance();
         $this->model = SittingModel::getInstance();
@@ -61,9 +63,10 @@ final class Sitting extends AbstractEntity {
      * @throws \noxkiwi\singleton\Exception\SingletonException
      * @throws \noxkiwi\core\Exception\InvalidArgumentException
      */
-    public function create(LobbyDataContract $Lobby): self {
-        $this->timeout = $Lobby->timeout;
-        $this->stepCount = $Lobby->songs;
+    public function create(LobbyDataContract $lobby): self
+    {
+        $this->timeout = $lobby->timeout;
+        $this->stepCount = $lobby->songs;
         $this->setName(uniqid("SPOTIGAME_SITTING_"));
 
         $mode = new GameMode();
@@ -95,12 +98,13 @@ final class Sitting extends AbstractEntity {
     }
 
 
-    public function join(Player $player): void {
+    public function join(Player $player): void
+    {
         // @todo: Check if player is already on the lobby....
 
         $this->sittingPlayerModel->save([
-            'sitting_id'           => $this->id,
-            'player_id'            => $player->id,
+            'sitting_id' => $this->id,
+            'player_id' => $player->id,
             'sitting_player_flags' => 1
         ]);
 
@@ -118,7 +122,8 @@ final class Sitting extends AbstractEntity {
      * @throws \noxkiwi\singleton\Exception\SingletonException
      * @throws \noxkiwi\core\Exception\InvalidArgumentException
      */
-    public function getNextMove(): Move {
+    public function getNextMove(): Move
+    {
         $current = $this->getRelativeStep();
         if ($current === 0) {
             $current = 1;
@@ -128,7 +133,8 @@ final class Sitting extends AbstractEntity {
         return $this->getCurrentMove();
     }
 
-    public static function expect(int $sittingId): self {
+    public static function expect(int $sittingId): self
+    {
         $entry = SittingModel::expect($sittingId);
         $result = new self();
         $result->setId((int)$entry->sitting_id);
@@ -138,7 +144,8 @@ final class Sitting extends AbstractEntity {
         return $result;
     }
 
-    public static function expectFromCode(string $sittingCode): self {
+    public static function expectFromCode(string $sittingCode): self
+    {
         $sittingModel = SittingModel::getInstance();
         $sittingModel->addFilter('sitting_code', $sittingCode);
         $sittingModel->search();
@@ -149,11 +156,13 @@ final class Sitting extends AbstractEntity {
 
     // Decide what to do with the following methods...
 
-    protected function setRelativeStep(int $step): void {
+    protected function setRelativeStep(int $step): void
+    {
         $this->session->set('CURRENT_STEP', $step);
     }
 
-    protected function getRelativeStep(): int {
+    protected function getRelativeStep(): int
+    {
         return (int)$this->session->get('CURRENT_STEP', 0);
     }
 
@@ -164,11 +173,13 @@ final class Sitting extends AbstractEntity {
      *
      * @return void
      */
-    public function setGameMode(AbstractGameMode $gameMode): void {
+    public function setGameMode(AbstractGameMode $gameMode): void
+    {
         $this->gameMode = $gameMode;
     }
 
-    private function generateMove(int $relativeStep): Move {
+    private function generateMove(int $relativeStep): Move
+    {
 
         $move = new Move();
         $move->Song = SongModel::getRandom($this->getPlayedSongs(), $this->gameMode);
@@ -196,7 +207,8 @@ final class Sitting extends AbstractEntity {
      * @throws \noxkiwi\spotigame\Exception\GameOverException
      * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
      */
-    public function getCurrentMove(): Move {
+    public function getCurrentMove(): Move
+    {
         return $this->getStep($this->getRelativeStep());
     }
 
@@ -206,7 +218,8 @@ final class Sitting extends AbstractEntity {
      * @throws \noxkiwi\singleton\Exception\SingletonException
      * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
      */
-    public function getUnfinishedPlayers(): array {
+    public function getUnfinishedPlayers(): array
+    {
         $sql = <<<SQL
 SELECT
 	`sitting_player`.`player_id`
@@ -227,7 +240,8 @@ SQL;
         return $r;
     }
 
-    public function finishRound(Player $player): void {
+    public function finishRound(Player $player): void
+    {
         $sql = <<<SQL
 UPDATE
 	`sitting_player`
@@ -245,7 +259,8 @@ SQL;
         $this->finalize();
     }
 
-    public function finalize(): void {
+    public function finalize(): void
+    {
         $sql = <<<SQL
 UPDATE
 	`sitting`
@@ -266,7 +281,8 @@ SQL;
      * @throws \noxkiwi\spotigame\Exception\GameOverException
      * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
      */
-    private function getStep(int $moveStep): Move {
+    private function getStep(int $moveStep): Move
+    {
         if ($moveStep === 0) {
             $moveStep = 1;
         }
@@ -295,7 +311,8 @@ SQL;
      * @throws \noxkiwi\singleton\Exception\SingletonException
      * @throws \noxkiwi\database\Exception\DatabaseException
      */
-    public function getPlayedSongs(): array {
+    public function getPlayedSongs(): array
+    {
         $songIds = [];
         foreach ($this->playedSongs as $playedSong) {
             $songIds[] = $playedSong->id;
@@ -304,7 +321,8 @@ SQL;
         return $songIds;
     }
 
-    public function addSong(Song $song): void {
+    public function addSong(Song $song): void
+    {
         $this->playedSongs[] = $song;
     }
 }

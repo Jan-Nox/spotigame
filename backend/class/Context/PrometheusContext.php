@@ -15,10 +15,12 @@ use noxkiwi\database\Database;
  * @version      1.0.0
  * @link         https://nox.kiwi/
  */
-final class PrometheusContext extends Context {
+final class PrometheusContext extends Context
+{
     private Database $database;
 
-    protected function __construct() {
+    protected function __construct()
+    {
         parent::__construct();
         $this->database = Database::getInstance();
     }
@@ -29,11 +31,13 @@ final class PrometheusContext extends Context {
      * - the current Sitting
      * @inheritDoc
      */
-    public function isAllowed(): bool {
+    public function isAllowed(): bool
+    {
         return true;
     }
 
-    protected function actionPrometheus(): void {
+    protected function actionPrometheus(): void
+    {
         $this->request->set('template', 'txt');
 
         $this->sittingDetails();
@@ -43,7 +47,8 @@ final class PrometheusContext extends Context {
         exit(200);
     }
 
-    private function sittingDetails() {
+    private function sittingDetails()
+    {
 
 
         // ALL POINTS
@@ -74,7 +79,8 @@ final class PrometheusContext extends Context {
 TXT;
     }
 
-    private function songDetails() {
+    private function songDetails()
+    {
         // ALL SONGS
         $this->database->read('SELECT COUNT(true) AS `songs` FROM song;');
         $rowsf = $this->database->getResult();
@@ -86,7 +92,8 @@ TXT;
 
     }
 
-    private function playerDetails(): void {
+    private function playerDetails(): void
+    {
 
         // NEW PLAYERS IN LAST 24 hours
         $this->database->read('SELECT COUNT(true) AS `players` FROM player WHERE player.player_created BETWEEN NOW() - INTERVAL 1 DAY AND NOW(); ');

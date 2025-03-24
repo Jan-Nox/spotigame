@@ -4,6 +4,7 @@ namespace noxkiwi\spotigame\Context;
 
 use noxkiwi\core\Constants\Mvc;
 use noxkiwi\core\Context;
+use \Exception;
 use noxkiwi\core\Environment;
 use noxkiwi\spotigame\GameEntity\Player\Player;
 use noxkiwi\spotigame\GameEntity\Sitting\Sitting;
@@ -24,7 +25,7 @@ abstract class AuthenticatedSpotigameContext extends Context
     protected Player $player;
 
     /** @var Sitting I am the Sitting the Player is currently playing. */
-    protected Sitting $Sitting;
+    protected Sitting $sitting;
 
 
     protected Environment $environment;

@@ -20,7 +20,7 @@ interface SittingInterface {
     /**
      * @return self
      */
-    public function create(LobbyDataContract $Lobby): self;
+    public function create(LobbyDataContract $lobby): self;
 
     /**
      * I will generate and return the next move.

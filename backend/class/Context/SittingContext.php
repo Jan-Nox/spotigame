@@ -24,7 +24,8 @@ use noxkiwi\spotigame\Result\User;
  * @version      1.0.0
  * @link         https://nox.kiwi/
  */
-final class SittingContext extends AuthenticatedSpotigameContext {
+final class SittingContext extends AuthenticatedSpotigameContext
+{
 
     /**
      * @return void
@@ -33,27 +34,29 @@ final class SittingContext extends AuthenticatedSpotigameContext {
      * @throws \noxkiwi\singleton\Exception\SingletonException
      * @throws \noxkiwi\core\Exception\InvalidArgumentException
      */
-    protected function actionCreate(): void {
+    protected function actionCreate(): void
+    {
         $this->logInfo("SittingContext::actionCreate called by " . $this->player);
 
         $this->request->set('template', 'json');
         // Create Lobby post
         $request = $this->request->get('Lobby', []);
-        $Lobby = LobbyDataContract::fromArray($request);
+        $lobby = LobbyDataContract::fromArray($request);
 
         // Create Sitting
         $sitting = new Sitting();
-        $sitting->create($Lobby);
-        $Lobby->code = $sitting->getName();
+        $sitting->create($lobby);
+        $lobby->code = $sitting->getName();
 
         // Join the player
         $sitting->join($this->player);
 
         // Add data to response for the front-end.
-        $this->response->set('Lobby', $Lobby);
+        $this->response->set('Lobby', $lobby);
     }
 
-    protected function actionJoin(): void {
+    protected function actionJoin(): void
+    {
         $sittingCode = $this->request->get('sittingCode', '');
         if (!$sittingCode) {
             throw new InvalidArgumentException("sittingCode is required");

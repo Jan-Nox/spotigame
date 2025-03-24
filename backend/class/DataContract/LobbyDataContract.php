@@ -21,10 +21,10 @@ final class LobbyDataContract {
     public string $code = '';
 
     public static function fromArray(array $data): self {
-        $Lobby = new self();
-        $Lobby->songs = min(max(3, (int)($data['songs'] ?? 3)), 100);
-        $Lobby->timeout = min(max((int)($data['timeout'] ?? 10), 10), 300);
+        $lobby = new self();
+        $lobby->songs = min(max(3, (int)($data['songs'] ?? 3)), 100);
+        $lobby->timeout = min(max((int)($data['timeout'] ?? 10), 10), 300);
 
-        return $Lobby;
+        return $lobby;
     }
 }

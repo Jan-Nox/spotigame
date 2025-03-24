@@ -16,11 +16,13 @@ use noxkiwi\database\Database;
  * @version      1.0.0
  * @link         https://nox.kiwi/
  */
-final class LeaderboardContext extends Context {
+final class LeaderboardContext extends Context
+{
     /**
      * @inheritDoc
      */
-    public function isAllowed(): bool {
+    public function isAllowed(): bool
+    {
         return true;
     }
 
@@ -28,7 +30,8 @@ final class LeaderboardContext extends Context {
      * @return void
      * @throws \noxkiwi\singleton\Exception\SingletonException
      */
-    public function actionGetPlayers(): void {
+    public function actionGetPlayers(): void
+    {
         $this->request->set('template', 'json');
         $sql = <<<MYSQL
 SELECT

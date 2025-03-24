@@ -32,7 +32,6 @@ class ReleaseyearGameMode extends AbstractGameMode {
 
     public function getTrackEverywhereFilter(): string {
         $parent = parent::getTrackEverywhereFilter();
-        $imploded = implode(', ', $this->artists);
         return <<<SQL
 $parent
 

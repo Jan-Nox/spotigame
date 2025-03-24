@@ -5,6 +5,7 @@ use noxkiwi\core\Exception\InvalidArgumentException;
 use noxkiwi\queue\Consumer\RabbitmqConsumer;
 use noxkiwi\queue\Message;
 use noxkiwi\spotigame\Message\PlaylistDeflateMessage;
+use \Exception;
 use const E_USER_NOTICE;
 
 /**
@@ -44,9 +45,11 @@ final class PlaylistDeflateConsumer extends RabbitmqConsumer
         }
 
         try {
+            // Do nothing for now.
         } catch (Exception) {
             //IGNORE NOW FOR FEEDING 🍔
         }
+
         return true;
     }
 

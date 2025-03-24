@@ -34,9 +34,9 @@ final class Answer extends AbstractEntity
     public AbstractQuestion $Question;
 
     public function save() {
-        $Answer = new Entry(AnswerModel::getInstance());
+        $answer = new Entry(AnswerModel::getInstance());
         $this->logError($this->__toString());
-        $Answer->set([
+        $answer->set([
             'answer_flags'   => 0,
             'answer_input'   => $this->answerInput,
             'answer_correct' => $this->answerCorrect,
@@ -44,7 +44,7 @@ final class Answer extends AbstractEntity
             'vote_id'        => $this->Vote->id,
             'question_id'    => $this->Question->id,
         ]);
-        $Answer->save();
+        $answer->save();
     }
 
     #[Pure] public function __toString(): string {

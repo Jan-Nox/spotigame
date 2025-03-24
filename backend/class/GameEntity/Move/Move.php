@@ -95,28 +95,28 @@ class Move extends AbstractEntity {
      * @throws \noxkiwi\singleton\Exception\SingletonException
      * @return AbstractQuestion[]
      */
-    public function getQuestions(Song $Song, GameMode $GameMode): array
+    public function getQuestions(Song $song, GameMode $gameMode): array
     {
         $Questions = [];
         // BUILD QUESTIONS
-        $Question1 = new ArtistMultipleChoice($Song, $GameMode);
+        $Question1 = new ArtistMultipleChoice($song, $gameMode);
         $Questions[$Question1->uuid] = $Question1;
 
-        $Question2 = new AlbumMultipleChoice($Song, $GameMode);
+        $Question2 = new AlbumMultipleChoice($song, $gameMode);
         $Questions[$Question2->uuid] = $Question2;
 
-        $Question3 = new TitleMultipleChoice($Song, $GameMode);
+        $Question3 = new TitleMultipleChoice($song, $gameMode);
         $Questions[$Question3->uuid] = $Question3;
 
         return $Questions;
     }
 
-    public function buildSetup(Player $Player, GameMode $GameMode): StepSetup
+    public function buildSetup(Player $player, GameMode $gameMode): StepSetup
     {
         $setup                    = new StepSetup;
-        $setup->Questions         = $this->getQuestions($this->Song, $GameMode);
+        $setup->Questions         = $this->getQuestions($this->Song, $gameMode);
         $setup->Song              = $this->Song;
-        $setup->Player            = $Player;
+        $setup->Player            = $player;
         $setup->Sitting           = $this->Sitting;
 
         return $setup;
@@ -125,15 +125,15 @@ class Move extends AbstractEntity {
     /** @var AnswerWrapper[] */
     public array $ResultAnswers = [];
 
-    public static function expect(int $moveId, GameMode $GameMode): self {
+    public static function expect(int $moveId, GameMode $gameMode): self {
 
-        $MoveEntity = MoveModel::expect($moveId);
-        $Move = new self();
-        $Move->id = $moveId;
-        $Move->Song = Song::expect($MoveEntity->song_id);
-        $Move->Questions = $Move->getQuestions($Move->Song, $GameMode);
+        $moveEntry = MoveModel::expect($moveId);
+        $move = new self();
+        $move->id = $moveId;
+        $move->Song = Song::expect($moveEntry->song_id);
+        $move->Questions = $move->getQuestions($move->Song, $gameMode);
 
-        return $Move;
+        return $move;
     }
 
     #[Pure] public function __toString(): string {

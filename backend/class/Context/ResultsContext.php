@@ -34,11 +34,7 @@ final class ResultsContext extends AuthenticatedSpotigameContext
 
         $sittingEntry = Sitting::expect($sittingId);
 
-        // START THE REPORT.
-        $Report = new FullResult($sittingEntry);
-
-
-        echo json_encode($Report, JSON_PRETTY_PRINT);
+        echo json_encode(new FullResult($sittingEntry), JSON_PRETTY_PRINT);
         exit(0);
     }
 

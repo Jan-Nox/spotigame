@@ -17,7 +17,7 @@ class GameMode extends AbstractGameMode {
     private array $artists;
 
     public function __construct(array $artists) {
-        if (count($artists) < 1) {
+        if (empty($artists)) {
             throw new \InvalidArgumentException('You need to provide at least one artist.');
         }
         $this->artists = $artists;

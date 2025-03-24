@@ -36,9 +36,9 @@ class Verification {
     public Move $Move;
 
 
-    public function __construct(Player $Player, Move $Move, array $postedStuff) {
-        $this->Player = $Player;
-        $this->Move = $Move;
+    public function __construct(Player $player, Move $move, array $postedStuff) {
+        $this->Player = $player;
+        $this->Move = $move;
 
         $this->Questions = $this->Move->getQuestions($this->Move->Song, new GameMode(''));
         $this->Vote = new Vote();
@@ -47,7 +47,7 @@ class Verification {
         $this->postedStuff = $postedStuff;
     }
 
-    private function generate(AbstractQuestion $Question, string $correctValue, string $correctLabel, string $decision, int $maxPoints): Answer {
+    private function generate(AbstractQuestion $question, string $correctValue, string $correctLabel, string $decision, int $maxPoints): Answer {
         $points = 0;
 
         // Check if the decision is correct.
@@ -56,7 +56,7 @@ class Verification {
         }
 
         $Answer = new Answer();
-        $Answer->Question = $Question;
+        $Answer->Question = $question;
         $Answer->Vote = $this->Vote;
         $Answer->answerCorrect = $correctValue;
         $Answer->answerInput = $decision;

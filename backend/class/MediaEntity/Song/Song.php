@@ -42,21 +42,21 @@ final class Song extends AbstractEntity
         $foundSong = $songModel->getResult();
 
         if ($foundSong) {
-            $Entry = SongModel::expect($foundSong[0]['song_id']);
+            $entry = SongModel::expect($foundSong[0]['song_id']);
         } else {
-            $Entry = $songModel->getEntry([]);
+            $entry = $songModel->getEntry([]);
         }
 
-        $Entry->song_title = $this->title;
-        $Entry->song_artist = $this->artist->name;
-        $Entry->song_albumcover = $this->album->cover;
-        $Entry->song_album = $this->album->name;
-        $Entry->song_year = $this->year;
-        $Entry->song_spotifyid = $this->spotifyId;
-        $Entry->song_duration = $this->duration;
-        $Entry->category_id = 1;
+        $entry->song_title = $this->title;
+        $entry->song_artist = $this->artist->name;
+        $entry->song_albumcover = $this->album->cover;
+        $entry->song_album = $this->album->name;
+        $entry->song_year = $this->year;
+        $entry->song_spotifyid = $this->spotifyId;
+        $entry->song_duration = $this->duration;
+        $entry->category_id = 1;
 
-        $Entry->save();
+        $entry->save();
 
     }
 

@@ -84,11 +84,11 @@ SQL
         return Move::expect($moveId, $this->GameMode);
     }
 
-    protected function addPlayer(Player $Player): void
+    protected function addPlayer(Player $player): void
     {
-        $rank = $this->buildRank($Player);
-        $this->Ranks[$Player->id] = $rank;
-        $this->Players[] = $Player;
+        $rank = $this->buildRank($player);
+        $this->Ranks[$player->id] = $rank;
+        $this->Players[] = $player;
     }
 
     private function buildRank(Player $player): Rank

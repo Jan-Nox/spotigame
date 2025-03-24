@@ -60,21 +60,21 @@ final class TrackImportConsumer extends RabbitmqConsumer
     {
         try {
             // Update the Song.
-            $Song = new Song();
-            $Song->title = $track->name;
-            $Song->artist = new Artist();
-            $Song->artist->name = $track->artists[0]->name;
-            $Song->album = new Album();
-            $Song->album->name = $track->album->name;
-            $Song->album->cover = $track->album->images[0]->url;
-            $Song->spotifyId = $track->id;
-            $Song->name = $track->name;
-            $Song->track = $track->track_number;
-            $Song->popularity = $track->popularity;
-            $Song->duration = (int)($track->duration_ms ?? 0);
-            $Song->year = (int)(new DateTime($track->album->release_date))->format('Y');
+            $song = new Song();
+            $song->title = $track->name;
+            $song->artist = new Artist();
+            $song->artist->name = $track->artists[0]->name;
+            $song->album = new Album();
+            $song->album->name = $track->album->name;
+            $song->album->cover = $track->album->images[0]->url;
+            $song->spotifyId = $track->id;
+            $song->name = $track->name;
+            $song->track = $track->track_number;
+            $song->popularity = $track->popularity;
+            $song->duration = (int)($track->duration_ms ?? 0);
+            $song->year = (int)(new DateTime($track->album->release_date))->format('Y');
 
-            $Song->save();
+            $song->save();
         } catch (Exception) {
             //IGNORE NOW FOR FEEDING 🍔
         }

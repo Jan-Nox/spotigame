@@ -26,7 +26,7 @@ class GameMode extends AbstractGameMode {
     public function getTrackEverywhereFilter(): string {
         $parent = parent::getTrackEverywhereFilter();
         $imploded = implode(', ', $this->artists);
-        return <<<SQL
+        return  <<<SQL
 $parent
 
 -- AND `song`.`song_created` > '2025-03-21 00:00:00'

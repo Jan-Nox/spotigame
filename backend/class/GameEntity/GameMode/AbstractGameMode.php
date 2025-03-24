@@ -17,7 +17,8 @@ use noxkiwi\spotigame\Entity\AbstractEntity;
  * @version      1.0.0
  * @link         https://nox.kiwi/
  */
-abstract class AbstractGameMode extends AbstractEntity {
+abstract class AbstractGameMode extends AbstractEntity
+{
     protected const TYPE = 'gameMode';
     public int $pointMultiplier = 1;
     public int $pointTitle = 1;
@@ -30,21 +31,19 @@ abstract class AbstractGameMode extends AbstractEntity {
      * I will return SQL that is used to filter the ANY songs that appear ANYWHERE in the game we create.
      * @return string
      */
-    public function getTrackEverywhereFilter(): string {
-        $sql = <<<SQL
+    public function getTrackEverywhereFilter(): string
+    {
+        return <<<SQL
 -- Common filters for all game modes added in AbstractGameMode
 AND `song`.`song_albumcover` IS NOT NULL
-SQL;
-        return $sql;
+SQL;;
     }
 
     /**
      * @return string
      */
-    public function getTrackRandomSelectionFilter(): string {
-        $sql = $this->getTrackEverywhereFilter();
-        return <<<SQL
-$sql
-SQL;
+    public function getTrackRandomSelectionFilter(): string
+    {
+        return $this->getTrackEverywhereFilter();
     }
 }

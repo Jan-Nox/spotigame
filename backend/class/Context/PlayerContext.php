@@ -57,21 +57,21 @@ final class PlayerContext extends AuthenticatedSpotigameContext
         $db = Database::getInstance();
         $sql = <<<SQL
 SELECT
-	SUM(`vote`.`vote_points`) AS `sitting_points`,
-	`sitting`.`sitting_steps`,
-	`sitting`.`sitting_code`,
-	`sitting`.`sitting_id`,
-	`sitting`.`sitting_code`,
-	2 AS `sitting_players`
+    SUM(`vote`.`vote_points`) AS `sitting_points`,
+    `sitting`.`sitting_steps`,
+    `sitting`.`sitting_code`,
+    `sitting`.`sitting_id`,
+    `sitting`.`sitting_code`,
+    2 AS `sitting_players`
 FROM
-	`vote`
-JOIN	`player`  USING (`player_id`)
-JOIN	`move`    USING (`move_id`)
+    `vote`
+JOIN    `player`  USING (`player_id`)
+JOIN    `move`    USING (`move_id`)
 JOIN    `sitting` USING (`sitting_id`)
 WHERE TRUE
     AND `player`.`player_id` = $player->playerId
 GROUP BY 
-	`sitting`.`sitting_id`
+    `sitting`.`sitting_id`
 ORDER BY
     `sitting`.`sitting_id` DESC
 ;

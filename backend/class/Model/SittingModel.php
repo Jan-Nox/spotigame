@@ -29,12 +29,12 @@ final class SittingModel extends Model
      * @throws \noxkiwi\singleton\Exception\SingletonException
      * @return \noxkiwi\spotigame\GameEntity\Sitting\Sitting
      */
-    private function getOpenSitting(Player $Player): Sitting
+    private function getOpenSitting(Player $player): Sitting
     {
         $session   = Session::getInstance();
         $sittingId = (int)$session->get('SITTING_ID', -1);
         if ($sittingId <= 0) {
-            throw new AuthenticationException("No open sitting for player $Player->id", 42);
+            throw new AuthenticationException("No open sitting for player $player->id", 42);
         }
         $entry              = self::expect($sittingId);
         $sitting            = new Sitting();
@@ -43,7 +43,7 @@ final class SittingModel extends Model
         $sitting->stepCount = (int)$entry->sitting_steps;
         $sitting->finished  = ((int)$entry->sitting_flags & 2) === 2;
         $sitting->sittingId = (int)$entry->sitting_id;
-        $sitting->Player = $Player;
+        $sitting->Player = $player;
         return $sitting;
     }
 

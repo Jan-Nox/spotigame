@@ -32,12 +32,12 @@ abstract class AbstractQuestion extends AbstractEntity {
     public string $decision;
     public array $result;
 
-    public function __construct(Song $song, GameMode $GameMode) {
+    public function __construct(Song $song, GameMode $gameMode) {
         parent::__construct();
         $this->id = static::QUESTION_ID;
         $this->name = static::QUESTION;
         $this->song = $song;
-        $this->GameMode = $GameMode;
+        $this->GameMode = $gameMode;
     }
 
     /**

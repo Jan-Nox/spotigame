@@ -97,18 +97,18 @@ class Move extends AbstractEntity {
      */
     public function getQuestions(Song $song, GameMode $gameMode): array
     {
-        $Questions = [];
+        $questions = [];
         // BUILD QUESTIONS
-        $Question1 = new ArtistMultipleChoice($song, $gameMode);
-        $Questions[$Question1->uuid] = $Question1;
+        $question1 = new ArtistMultipleChoice($song, $gameMode);
+        $questions[$question1->uuid] = $question1;
 
-        $Question2 = new AlbumMultipleChoice($song, $gameMode);
-        $Questions[$Question2->uuid] = $Question2;
+        $question2 = new AlbumMultipleChoice($song, $gameMode);
+        $questions[$question2->uuid] = $question2;
 
-        $Question3 = new TitleMultipleChoice($song, $gameMode);
-        $Questions[$Question3->uuid] = $Question3;
+        $question3 = new TitleMultipleChoice($song, $gameMode);
+        $questions[$question3->uuid] = $question3;
 
-        return $Questions;
+        return $questions;
     }
 
     public function buildSetup(Player $player, GameMode $gameMode): StepSetup

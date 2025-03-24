@@ -41,14 +41,16 @@ abstract class OptionHelper
                 'value' => $randomPickKey
             ];
         }
-        $picks = self::shuffle_assoc($picks);
+        $picks = self::shuffle($picks);
 
         return array_values($picks);
     }
 
-    public static function shuffle_assoc(array $list): array
+    public static function shuffle(array $list): array
     {
-        if (!is_array($list)) return $list;
+        if (!is_array($list)) {
+            return $list;
+        }
 
         $keys = array_keys($list);
         shuffle($keys);

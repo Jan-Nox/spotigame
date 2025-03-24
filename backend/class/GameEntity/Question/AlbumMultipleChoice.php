@@ -30,14 +30,14 @@ final class AlbumMultipleChoice extends AbstractQuestion
      *
      * @throws \noxkiwi\singleton\Exception\SingletonException
      */
-    public function __construct(Song $song, GameMode $GameMode)
+    public function __construct(Song $song, GameMode $gameMode)
     {
         $this->name = 'From what Album is the song?';
         $this->emoji = '📀';
         $this->uuid = 'From what Album is the song?';
         $this->id = 2;
         $this->options = OptionHelper::randomPick(SongModel::getInstance()->getList('song_album'), $song->album, 3);
-        parent::__construct($song, $GameMode);
+        parent::__construct($song, $gameMode);
         $this->uuid = 'AlbumMultipleChoice';
     }
     public const QUESTION = 'album_multiple_choice';

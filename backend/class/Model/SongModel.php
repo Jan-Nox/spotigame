@@ -47,59 +47,6 @@ final class SongModel extends Model {
     /**
      * From all the Songs we know in our own meta database, I will return ONE Random song instance.
      *
-     * @param AbstractSong[] $excludedSongs
-     *
-     * @return \noxkiwi\spotigame\MediaEntity\Song\Song
-     * @throws \noxkiwi\database\Exception\DatabaseException
-     * @throws \noxkiwi\singleton\Exception\SingletonException
-     * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
-     */
-    public static function getRandomSongs(array $excludedSongs, GameMode $GameMode, int $count = 1, ?AbstractSong $correct = null): Song {
-        $limit = $count;
-
-        if ($correct) {
-            $limit = $count -1;
-        }
-
-        $exclude = '';
-        if ($excludedSongs) {
-            $exclude = 'WHERE  `song`.`song_id` NOT IN (' . implode(',', $excludedSongs ?? [0]) . ')';
-        }
-
-
-        $sql = <<<SQL
-SELECT `song_id`
-FROM   `song`
-    $exclude
-   AND `song`.`song_id` != $songId
-    
-{$GameMode->getTrackEverywhereFilter()}
-
-ORDER BY RAND() LIMIT {$limit}
-
-UNION ALL
-
-SELECT `song_id`
-FROM   `song`
-WHERE  `song`.`song_id` = $specificSongId
-    
-{$GameMode->getTrackEverywhereFilter()}
-SQL;
-        $db = Database::getInstance();
-        $db->read($sql);
-        $rows = $db->getResult();
-
-        $result = [];
-        foreach ($rows as $row) {
-            $result [] = Song::expect((int)$row[0]['song_id']);
-        }
-
-        return $result;
-    }
-
-    /**
-     * From all the Songs we know in our own meta database, I will return ONE Random song instance.
-     *
      * @param array|null $excludedSongs
      *
      * @return \noxkiwi\spotigame\MediaEntity\Song\Song
@@ -107,7 +54,7 @@ SQL;
      * @throws \noxkiwi\singleton\Exception\SingletonException
      * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
      */
-    public static function getRandom(array $excludedSongs, GameMode $GameMode, int $count = 1): Song {
+    public static function getRandom(array $excludedSongs, GameMode $gameMode, int $count = 1): Song {
         $exclude = '';
         if ($excludedSongs) {
             $exclude = ' AND `song`.`song_id` NOT IN (' . implode(',', $excludedSongs ?? [0]) . ')';
@@ -117,7 +64,7 @@ SELECT `song_id`
 FROM   `song`
 WHERE TRUE  $exclude
     
-{$GameMode->getTrackEverywhereFilter()}
+{$gameMode->getTrackEverywhereFilter()}
 
 -- Yes use a random song
 ORDER BY RAND() LIMIT 1
@@ -156,6 +103,7 @@ SQL;
         try {
             Cache::getInstance()->set('SPOTIGAME_META', $fieldName, $list);
         } catch (Exception) {
+            // Ignored
         }
     }
 

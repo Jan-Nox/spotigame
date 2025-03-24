@@ -35,12 +35,12 @@ final class LeaderboardContext extends Context
         $this->request->set('template', 'json');
         $sql = <<<MYSQL
 SELECT
-	`player`.`player_name` AS `name`,
+    `player`.`player_name` AS `name`,
     `player`.`player_url` AS `url`,
     `player`.`player_avatar` AS `avatar`,
     `player`.`player_points` AS `points`
 FROM
-	`player`
+    `player`
 ORDER BY `player_points` DESC;
 MYSQL;
         $db = Database::getInstance();

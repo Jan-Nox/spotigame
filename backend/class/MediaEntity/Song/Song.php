@@ -34,17 +34,17 @@ final class Song extends AbstractEntity
 
     public function save(): void
     {
-        $SongModel = SongModel::getInstance();
+        $songModel = SongModel::getInstance();
         // Fetch song if it exists by SpotifyId
 
-        $SongModel->addFilter('song_spotifyid', $this->spotifyId);
-        $SongModel->search();
-        $foundSong = $SongModel->getResult();
+        $songModel->addFilter('song_spotifyid', $this->spotifyId);
+        $songModel->search();
+        $foundSong = $songModel->getResult();
 
         if ($foundSong) {
             $Entry = SongModel::expect($foundSong[0]['song_id']);
         } else {
-            $Entry = $SongModel->getEntry([]);
+            $Entry = $songModel->getEntry([]);
         }
 
         $Entry->song_title = $this->title;

@@ -34,14 +34,14 @@ final class TitleMultipleChoice extends AbstractQuestion
      *
      * @throws \noxkiwi\singleton\Exception\SingletonException
      */
-    public function __construct(Song $song, GameMode $GameMode)
+    public function __construct(Song $song, GameMode $gameMode)
     {
         $this->name = 'What is the title?';
         $this->emoji = '🎼';
         $this->uuid = 'What is the title?';
         $this->id = 3;
         $this->options = OptionHelper::randomPick(SongModel::getInstance()->getList('song_title'), $song, 3);
-        parent::__construct($song, $GameMode);
+        parent::__construct($song, $gameMode);
         $this->uuid = 'TitleMultipleChoice';
     }
 

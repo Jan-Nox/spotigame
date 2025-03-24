@@ -219,7 +219,6 @@ HTML
             // Also invalidate the cache for the current trackId to make the import proceed.
             $this->cache->set('trackId', 'trackId', null);
 
-            #         LinkHelper::forward('?context=feed&action=track');
         } catch (Exception $e) {
             echo <<<HTML
 <h3>Error during import of $trackId</h3>

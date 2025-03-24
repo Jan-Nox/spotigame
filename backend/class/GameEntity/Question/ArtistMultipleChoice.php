@@ -49,14 +49,14 @@ final class ArtistMultipleChoice extends AbstractQuestion
      *
      * @throws \noxkiwi\singleton\Exception\SingletonException
      */
-    public function __construct(Song $song, GameMode $GameMode)
+    public function __construct(Song $song, GameMode $gameMode)
     {
         $this->name = 'Who is the artist?';
         $this->emoji = '🎤';
         $this->uuid = 'Who is the artist?';
         $this->id = 1;
-        $this->options = OptionHelper::randomPick(SongModel::getInstance()->getList('song_artist', $GameMode), $song->artist, 3);
-        parent::__construct($song, $GameMode);
+        $this->options = OptionHelper::randomPick(SongModel::getInstance()->getList('song_artist', $gameMode), $song->artist, 3);
+        parent::__construct($song, $gameMode);
         $this->uuid = 'ArtistMultipleChoice';
     }
 }

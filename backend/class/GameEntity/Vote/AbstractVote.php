@@ -32,7 +32,7 @@ abstract class AbstractVote extends AbstractEntity {
     public AbstractQuestion $Question;
 
     public function save() {
-        $Entry = new Entry(VoteModel::getInstance(), [
+        $entry = new Entry(VoteModel::getInstance(), [
             'vote_flags'  => 1,
             'vote_points' => 0,
             'move_id'     => $this->Move->id,
@@ -40,9 +40,9 @@ abstract class AbstractVote extends AbstractEntity {
         ]);
 
 
-        $Entry->save();
+        $entry->save();
 
-        $this->setId((int)$Entry->vote_id);
+        $this->setId((int)$entry->vote_id);
     }
 
     #[Pure] public function __toString(): string {

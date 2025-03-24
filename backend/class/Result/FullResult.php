@@ -38,10 +38,10 @@ final class FullResult
 
     public array $Pointsmap = [];
 
-    public function __construct(Sitting $Sitting)
+    public function __construct(Sitting $sitting)
     {
         $this->Database = Database::getInstance();
-        $this->Sitting = $Sitting;
+        $this->Sitting = $sitting;
         $this->GameMode = new GameMode();
 
         // First load the participating users.
@@ -80,34 +80,32 @@ SQL
 
     private function buildMove(int $moveId): Move
     {
-        $moveEntry = MoveModel::expect($moveId);
-
         // BUILD EVERY MOVE
         return Move::expect($moveId, $this->GameMode);
     }
 
     protected function addPlayer(Player $Player): void
     {
-        $Rank = $this->buildRank($Player);
-        $this->Ranks[$Player->id] = $Rank;
+        $rank = $this->buildRank($Player);
+        $this->Ranks[$Player->id] = $rank;
         $this->Players[] = $Player;
     }
 
-    private function buildRank(Player $Player): Rank
+    private function buildRank(Player $player): Rank
     {
-        $Rank = new Rank();
-        $Rank->Player = $Player;
-        $Rank->Points = 0;
-        $Rank->Rank = 1;
-        $Rank->Time = "04:32:000";
-        return $Rank;
+        $rank = new Rank();
+        $rank->Player = $player;
+        $rank->Points = 0;
+        $rank->Rank = 1;
+        $rank->Time = "04:32:000";
+        return $rank;
     }
 
     private function loadResults(): void
     {
         $sql = <<<SQL
 SELECT
-	*
+    *
 FROM
     `answer`
 JOIN vote USING (vote_id)

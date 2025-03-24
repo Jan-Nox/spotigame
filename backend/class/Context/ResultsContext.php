@@ -2,10 +2,6 @@
 
 namespace noxkiwi\spotigame\Context;
 
-use noxkiwi\core\Context\ResourceContext as BaseResourceContext;
-use noxkiwi\database\Database;
-use noxkiwi\spotigame\Model\PlayerModel;
-use noxkiwi\spotigame\Model\SittingModel;
 use noxkiwi\spotigame\Result\Album;
 use noxkiwi\spotigame\Result\Artist;
 use noxkiwi\spotigame\Result\FullResult;

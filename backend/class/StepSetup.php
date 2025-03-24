@@ -1,13 +1,11 @@
 <?php declare(strict_types = 1);
 namespace noxkiwi\spotigame;
 
-use noxkiwi\core\Helper\LinkHelper;
 use noxkiwi\spotigame\Entity\AbstractEntity;
 use noxkiwi\spotigame\GameEntity\Player\Player;
 use noxkiwi\spotigame\GameEntity\Question\AbstractQuestion;
 use noxkiwi\spotigame\GameEntity\Sitting\Sitting;
 use noxkiwi\spotigame\MediaEntity\Song\Song;
-use noxkiwi\spotigame\GameEntity\Step\Step;
 
 /**
  * I am the spotigame App.

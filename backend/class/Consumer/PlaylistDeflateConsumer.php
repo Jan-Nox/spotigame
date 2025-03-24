@@ -4,12 +4,7 @@ namespace noxkiwi\spotigame\Consumer;
 use noxkiwi\core\Exception\InvalidArgumentException;
 use noxkiwi\queue\Consumer\RabbitmqConsumer;
 use noxkiwi\queue\Message;
-use noxkiwi\spotigame\MediaEntity\Album\Album;
-use noxkiwi\spotigame\MediaEntity\Artist\Artist;
-use noxkiwi\spotigame\MediaEntity\Song\Song;
 use noxkiwi\spotigame\Message\PlaylistDeflateMessage;
-use noxkiwi\spotigame\Message\TrackImportMessage;
-use function print_r;
 use const E_USER_NOTICE;
 
 /**

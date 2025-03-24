@@ -1,13 +1,11 @@
 <?php declare(strict_types = 1);
 namespace noxkiwi\spotigame\Model;
 
-use noxkiwi\core\Exception;
 use noxkiwi\core\Exception\AuthenticationException;
 use noxkiwi\core\Session;
 use noxkiwi\dataabstraction\Model;
 use noxkiwi\spotigame\GameEntity\Player\Player;
 use noxkiwi\spotigame\GameEntity\Sitting\Sitting;
-use function uniqid;
 
 /**
  * I am the storage for all Sittings.

@@ -5,7 +5,6 @@ namespace noxkiwi\spotigame\Context;
 use noxkiwi\core\Constants\Mvc;
 use noxkiwi\core\Context;
 use noxkiwi\core\Environment;
-use noxkiwi\core\Helper\WebHelper;
 use noxkiwi\spotigame\GameEntity\Player\Player;
 use noxkiwi\spotigame\GameEntity\Sitting\Sitting;
 

@@ -1,8 +1,6 @@
 <?php declare(strict_types = 1);
 namespace noxkiwi\spotigame;
 
-use noxkiwi\core\Helper\LinkHelper;
-
 /**
  * I am the spotigame App.
  *

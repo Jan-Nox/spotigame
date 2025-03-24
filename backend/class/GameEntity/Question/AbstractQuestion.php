@@ -2,6 +2,7 @@
 
 namespace noxkiwi\spotigame\GameEntity\Question;
 
+use JetBrains\PhpStorm\Pure;
 use noxkiwi\core\Request;
 use noxkiwi\spotigame\Entity\AbstractEntity;
 use noxkiwi\spotigame\GameEntity\Answer;
@@ -72,7 +73,7 @@ abstract class AbstractQuestion extends AbstractEntity {
         return $answer;
     }
 
-    public function __toString(): string {
+    #[Pure] public function __toString(): string {
         return <<<XML
 <question
   id="{$this->id}">

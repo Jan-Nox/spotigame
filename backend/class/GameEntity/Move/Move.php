@@ -2,6 +2,7 @@
 
 namespace noxkiwi\spotigame\GameEntity\Move;
 
+use JetBrains\PhpStorm\Pure;
 use noxkiwi\cache\Cache;
 use noxkiwi\core\Request;
 use noxkiwi\core\Traits\LanguageImprovementTrait;
@@ -135,7 +136,7 @@ class Move extends AbstractEntity {
         return $Move;
     }
 
-    public function __toString(): string {
+    #[Pure] public function __toString(): string {
         return <<<XML
 <Move>
     {$this->Song}

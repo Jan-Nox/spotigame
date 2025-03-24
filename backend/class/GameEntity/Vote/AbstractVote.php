@@ -2,12 +2,11 @@
 
 namespace noxkiwi\spotigame\GameEntity\Vote;
 
+use JetBrains\PhpStorm\Pure;
 use noxkiwi\dataabstraction\Entry;
 use noxkiwi\spotigame\Entity\AbstractEntity;
 use noxkiwi\spotigame\GameEntity\Move\Move;
-use noxkiwi\spotigame\GameEntity\Player\Player;
 use noxkiwi\spotigame\GameEntity\Question\AbstractQuestion;
-use noxkiwi\spotigame\GameEntity\Sitting\Sitting;
 use noxkiwi\spotigame\Model\VoteModel;
 
 /**
@@ -46,7 +45,7 @@ abstract class AbstractVote extends AbstractEntity {
         $this->setId((int)$Entry->vote_id);
     }
 
-    public function __toString(): string {
+    #[Pure] public function __toString(): string {
         return <<<XML
 <Vote
     id="{$this->id}"

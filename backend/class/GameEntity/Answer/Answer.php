@@ -1,6 +1,7 @@
 <?php declare(strict_types = 1);
 namespace noxkiwi\spotigame\GameEntity\Answer;
 
+use JetBrains\PhpStorm\Pure;
 use noxkiwi\dataabstraction\Entry;
 use noxkiwi\spotigame\Entity\AbstractEntity;
 use noxkiwi\spotigame\GameEntity\Question\AbstractQuestion;
@@ -46,7 +47,7 @@ final class Answer extends AbstractEntity
         $Answer->save();
     }
 
-    public function __toString(): string {
+    #[Pure] public function __toString(): string {
         return <<<XML
 <Answer id="{$this->id}" correct="{$this->answerCorrect}" input="{$this->answerInput}" />
 XML;

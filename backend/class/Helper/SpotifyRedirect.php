@@ -2,8 +2,6 @@
 
 namespace noxkiwi\spotigame\Helper;
 
-use noxkiwi\spotigame\Entity\AbstractEntity;
-
 /**
  * I am the Option helper. I will help generating options and lists.
  *

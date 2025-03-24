@@ -11,7 +11,6 @@ use noxkiwi\spotigame\GameEntity\Move\Move;
 use noxkiwi\spotigame\GameEntity\Player\Player;
 use noxkiwi\spotigame\GameEntity\Question\AbstractQuestion;
 use noxkiwi\spotigame\GameEntity\Vote\Vote;
-use noxkiwi\spotigame\MediaEntity\Song\Song;
 
 /**
  * I am the spotigame App.

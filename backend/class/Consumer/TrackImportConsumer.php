@@ -8,7 +8,6 @@ use noxkiwi\spotigame\MediaEntity\Album\Album;
 use noxkiwi\spotigame\MediaEntity\Artist\Artist;
 use noxkiwi\spotigame\MediaEntity\Song\Song;
 use noxkiwi\spotigame\Message\TrackImportMessage;
-use function print_r;
 use const E_USER_NOTICE;
 
 /**

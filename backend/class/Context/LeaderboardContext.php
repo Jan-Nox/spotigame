@@ -2,14 +2,8 @@
 
 namespace noxkiwi\spotigame\Context;
 
-use DateTime;
-use Exception;
-use noxkiwi\cache\Cache;
 use noxkiwi\core\Context;
 use noxkiwi\database\Database;
-use noxkiwi\spotigame\Model\SongModel;
-use noxkiwi\spotigame\RemoteApi\Spotify;
-use noxkiwi\spotigame\MediaEntity\Song\Song;
 
 /**
  * I am the Context object that manages data transfer between Crud Frontend and Crud backend.

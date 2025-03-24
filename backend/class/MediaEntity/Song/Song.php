@@ -3,6 +3,8 @@
 namespace noxkiwi\spotigame\MediaEntity\Song;
 
 use noxkiwi\spotigame\Entity\AbstractEntity;
+use noxkiwi\spotigame\MediaEntity\Album\Album;
+use noxkiwi\spotigame\MediaEntity\Artist\Artist;
 use noxkiwi\spotigame\Model\SongModel;
 
 /**
@@ -15,9 +17,23 @@ use noxkiwi\spotigame\Model\SongModel;
  * @version      1.0.0
  * @link         https://nox.kiwi/
  */
-final class Song extends AbstractEntity {
-    
-    public function save(): void {
+final class Song extends AbstractEntity
+{
+
+    protected const TYPE = 'song';
+    public int $year;
+    public Artist $artist;
+    public Album $album;
+    public string $title;
+    public string $image;
+    public int $track;
+    public int $popularity;
+    public int $duration;
+    public string $spotifyId;
+    public int $songId;
+
+    public function save(): void
+    {
         $SongModel = SongModel::getInstance();
         // Fetch song if it exists by SpotifyId
 
@@ -42,6 +58,59 @@ final class Song extends AbstractEntity {
 
         $Entry->save();
 
+    }
+
+    /**
+     * @param int $songId
+     *
+     * @return static
+     * @throws \noxkiwi\singleton\Exception\SingletonException
+     * @throws \noxkiwi\dataabstraction\Exception\EntryMissingException
+     */
+    final public static function expect(int $songId): self
+    {
+        $entry = SongModel::expect($songId);
+        $song = new self();
+        $song->setName($entry->song_title);
+        $song->uuid =  $entry->song_spotifyid;
+        $song->spotifyId = $entry->song_spotifyid;
+        $song->artist = new Artist();
+        $song->artist->name = $entry->song_artist;
+        $song->artist->uuid = $entry->song_spotifyid;
+        $song->album = new Album();
+        $song->album->name = $entry->song_album;
+        $song->album->cover = $entry->song_albumcover;
+        $song->album->uuid = $entry->song_spotifyid;
+        $song->id = (int)$entry->song_id;
+        $song->title = $entry->song_title;
+        $song->year = (int)$entry->song_year;
+        $song->track = (int)$entry->song_track;
+        $song->popularity = (int)$entry->song_popularity;
+        $song->image = (string)$entry->song_image;
+        $song->duration = (int)$entry->song_duration;
+        if ($song->duration === 0) {
+            $song->duration = 999999;
+        }
+
+        return $song;
+    }
+
+    public function __toString(): string
+    {
+        return <<<XML
+<song
+    spotifyId="$this->spotifyId"
+    artist="$this->artist"
+    id="$this->id"
+    album="$this->album"
+    title="$this->title"
+    year="$this->year"
+    track="$this->track"
+    popularity="$this->popularity"
+    image="$this->image"
+    duration="$this->duration">
+</song>
+XML;
     }
 
 }

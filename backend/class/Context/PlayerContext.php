@@ -4,7 +4,6 @@ namespace noxkiwi\spotigame\Context;
 
 use Exception;
 use noxkiwi\core\Constants\Mvc;
-use noxkiwi\core\Context;
 use noxkiwi\database\Database;
 use noxkiwi\spotigame\Auth\SpotigameAuth;
 use noxkiwi\spotigame\GameEntity\Player\Player;

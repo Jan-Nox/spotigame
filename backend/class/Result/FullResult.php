@@ -2,20 +2,11 @@
 
 namespace noxkiwi\spotigame\Result;
 
-use noxkiwi\core\Exception\InvalidArgumentException;
-use noxkiwi\dataabstraction\Entry;
 use noxkiwi\database\Database;
 use noxkiwi\spotigame\GameEntity\GameMode\GameMode;
 use noxkiwi\spotigame\GameEntity\Player\Player;
-use noxkiwi\spotigame\GameEntity\Question\AbstractQuestion;
-use noxkiwi\spotigame\GameEntity\Question\AlbumMultipleChoice;
-use noxkiwi\spotigame\GameEntity\Question\ArtistMultipleChoice;
-use noxkiwi\spotigame\GameEntity\Question\TitleMultipleChoice;
 use noxkiwi\spotigame\GameEntity\Move\Move;
-use noxkiwi\spotigame\MediaEntity\Song\Song;
 use noxkiwi\spotigame\Model\MoveModel;
-use noxkiwi\spotigame\Model\SittingModel;
-use noxkiwi\spotigame\Model\SongModel;
 use noxkiwi\spotigame\GameEntity\Sitting\Sitting;
 
 /**

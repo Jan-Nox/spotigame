@@ -11,7 +11,6 @@ use noxkiwi\spotigame\GameEntity\GameMode\AbstractGameMode;
 use noxkiwi\spotigame\GameEntity\GameMode\GameMode;
 use noxkiwi\spotigame\GameEntity\Move\Move;
 use noxkiwi\spotigame\GameEntity\Player\Player;
-use noxkiwi\spotigame\Interfaces\PlayerInterface;
 use noxkiwi\spotigame\MediaEntity\Song\Song;
 use noxkiwi\spotigame\Model\MoveModel;
 use noxkiwi\spotigame\Model\SittingModel;

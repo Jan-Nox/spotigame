@@ -6,12 +6,9 @@ use DateTime;
 use Exception;
 use noxkiwi\cache\Cache;
 use noxkiwi\core\Context;
-use noxkiwi\core\Helper\LinkHelper;
-use noxkiwi\spotigame\Auth\SpotigameAuth;
 use noxkiwi\spotigame\Helper\SpotifyRedirect;
 use noxkiwi\spotigame\MediaEntity\Album\Album;
 use noxkiwi\spotigame\MediaEntity\Artist\Artist;
-use noxkiwi\spotigame\Model\SongModel;
 use noxkiwi\spotigame\RemoteApi\Spotify;
 use noxkiwi\spotigame\MediaEntity\Song\Song;
 
